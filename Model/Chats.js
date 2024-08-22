@@ -10,9 +10,9 @@ const ChatsSchema = new mongoose.Schema(
                     userId: {type:String},
                     messageId: {type:String},
                     messageTime: {type:String},
-                    content: {type:String, default:null},
-                    img: {type:String}, default : null,
-                    voice : {type:String, default: null}
+                    content: {type:String},
+                    img: {type:String},
+                    voice : {type:String}
                 }]
         
         
