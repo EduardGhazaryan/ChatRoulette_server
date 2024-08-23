@@ -9,8 +9,7 @@ const UserSchema = new mongoose.Schema(
         status: { type: String, default: "online" },
         premium: { type: Boolean, default: false },
         chats: [{ type: mongoose.Schema.Types.ObjectId, ref: "Chats" }],
-        chatBonus : {type:Number, default:0},
-        rouletteBonus : {type:Number, default:0},
+        bonus : {type:Number, default:0},
         phoneID: {type:String,required:true},
         access_token: {type:String, required:true}
     },

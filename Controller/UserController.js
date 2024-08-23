@@ -152,12 +152,11 @@ const UserController = {
     changeBonus : async(req,res)=>{
         try {
             const {bonus} = req.body
-            console.log(bonus);
+
             const access_token = req?.headers?.authorization
             const token = access_token.split(" ")[1]
             
             const language = req.headers["accept-language"]
-            console.log("controller---",token, bonus);
 
 
             const data = await UserService.changeBonus(token,bonus,language)

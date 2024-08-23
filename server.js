@@ -314,13 +314,13 @@ io.on("connection", (socket) => {
 							r.chatBonus = r.chatBonus + 1
 						}
 					})
-					findUser.chatBonus = findUser.chatBonus + 1
+					findUser.bonus = findUser.bonus + 1
 
 					await findUser.save()
 				}
 			}else{
 				userCount.push({socketID: findBySocketID, roomId: message.roomId, chatBonus: 1})
-				findUser.chatBonus = findUser.chatBonus + 1
+				findUser.bonus = findUser.bonus + 1
 					await findUser.save()
 			}
 			
