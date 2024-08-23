@@ -18,6 +18,6 @@ UserRouter.post("/stopSearch", UserController.stopSearch)
 
 UserRouter.put("/chat/:id", UserController.changeChat)
 
-UserRouter.put("/changeBonus/:id",UserController.changeBonus)
+UserRouter.put("/changeBonus",UserController.changeBonus)
 
 module.exports = UserRouter;

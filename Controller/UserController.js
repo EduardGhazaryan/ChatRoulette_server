@@ -153,10 +153,12 @@ const UserController = {
         try {
             const {bonus} = req.body
 
-            const {id} = req.params
+            const access_token = req?.headers?.authorization
+            const token = access_token.split(" ")[1]
+            
             const language = req.headers["accept-language"]
 
-            const data = await UserService.changeBonus(id,bonus,language)
+            const data = await UserService.changeBonus(token,bonus,language)
 
             
             if(data.status === 202 || data.status === 200){

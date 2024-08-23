@@ -733,12 +733,12 @@ const UserService = {
             return {status: 400 , message : "Bad Request"}
         }
     },
-    changeBonus : async (userId,bonus,language)=>{
-        if(userId && bonus){
-            const findUser = await User.findById(userId)
+    changeBonus : async (token,bonus,language)=>{
+        if(token && bonus){
+            const findUser = await User.findOne({access_token: token})
 
             if(findUser){
-                findUser.chatBonus = findUser.chatBonus  + bonus
+                findUser.rouletteBonus = findUser.rouletteBonus  + bonus
 
                 await findUser.save()
 
