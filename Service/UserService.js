@@ -739,7 +739,7 @@ const UserService = {
             const findUser = await User.findOne({access_token: token})
 
             if(findUser){
-                findUser.rouletteBonus = findUser.bonus  + bonus
+                findUser.bonus = findUser.bonus  + bonus
 
                 await findUser.save()
 
