@@ -735,6 +735,7 @@ const UserService = {
     },
     changeBonus : async (token,bonus,language)=>{
         if(token && bonus){
+            console.log("service---",token, bonus);
             const findUser = await User.findOne({access_token: token})
 
             if(findUser){

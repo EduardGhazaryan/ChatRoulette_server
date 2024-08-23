@@ -157,6 +157,8 @@ const UserController = {
             const token = access_token.split(" ")[1]
             
             const language = req.headers["accept-language"]
+            console.log("controller---",token, bonus);
+
 
             const data = await UserService.changeBonus(token,bonus,language)
 
