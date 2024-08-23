@@ -152,7 +152,7 @@ const UserController = {
     changeBonus : async(req,res)=>{
         try {
             const {bonus} = req.body
-
+            console.log(bonus);
             const access_token = req?.headers?.authorization
             const token = access_token.split(" ")[1]
             

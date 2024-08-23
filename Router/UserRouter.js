@@ -10,14 +10,15 @@ UserRouter.get('/search/:id', UserController.search);
 
 UserRouter.get("/:id", UserController.getUser)
 
-UserRouter.put("/:id", UserController.changeUser)
+UserRouter.put("/changeBonus",UserController.changeBonus)
 
 UserRouter.post("/addChat", UserController.addChat)
 
 UserRouter.post("/stopSearch", UserController.stopSearch)
 
+UserRouter.put("/:id", UserController.changeUser)
+
 UserRouter.put("/chat/:id", UserController.changeChat)
 
-UserRouter.put("/changeBonus",UserController.changeBonus)
 
 module.exports = UserRouter;
