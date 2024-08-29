@@ -108,6 +108,7 @@ const UserController = {
     },
     changeUser: async (req,res)=>{
         try {
+            console.log(11);
             const {gender,age}= req.body
             const access_token = req?.headers?.authorization
             const token = access_token.split(" ")[1]
