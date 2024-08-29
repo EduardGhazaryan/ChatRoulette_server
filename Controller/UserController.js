@@ -84,10 +84,11 @@ const UserController = {
     },
     getUserChat: async (req,res)=>{
         try {
-             const {userId} = req.body
+             const {id} = req.params
              const language = req.headers["accept-language"]
 
-             const data = await UserService.getUserChat(userId,language)
+             console.log("getchat-id----",id);
+             const data = await UserService.getUserChat(id,language)
 
              if(data.status < 400){
                 if(data.success){

@@ -10,7 +10,7 @@ UserRouter.get('/search/:id', UserController.search);
 
 UserRouter.get("/:id", UserController.getUser)
 
-UserRouter.get("/getChats", UserController.getUserChat)
+UserRouter.get("/getChats/:id", UserController.getUserChat)
 
 UserRouter.put("/changeBonus",UserController.changeBonus)
 
@@ -18,7 +18,7 @@ UserRouter.post("/addChat", UserController.addChat)
 
 UserRouter.post("/stopSearch", UserController.stopSearch)
 
-UserRouter.put("/chnageUser", UserController.changeUser)
+UserRouter.put("/changeUser", UserController.changeUser)
 
 UserRouter.put("/chat/:id", UserController.changeChat)
 
