@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const Chats = require("../Model/Chats.js");
 const OnlineUsers  = require("../Model/OnlineUsers.js");
 const User = require("../Model/User.js");
@@ -629,11 +630,12 @@ const UserService = {
     getUserChat : async (userId,language)=>{
         if(userId){
             const allChats = await Chats.find()
-            const userChats = allChats.filter(c => c.userId === userId)
-
+            const userChats = allChats.filter(c => c.userId == userId)
+            
             if(userChats.length > 0){
+                console.log("server--",userChats);
 
-                return {status:200, chats:userChats}                
+                return {status:200, chats:userChats, success:true}                
 
             }else{
                 if(language){
@@ -647,7 +649,7 @@ const UserService = {
                         return {status:200 , message: "У вас нет сохраненной переписки", success:false}
                     }
                 }else{
-                    return {status: 400, message:"Bad Request", success:false}
+                    return {status:200 , message: "You have no saved chats", success:false}
                 }
             }
 

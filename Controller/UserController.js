@@ -90,7 +90,7 @@ const UserController = {
              console.log("getchat-id----",id);
              const data = await UserService.getUserChat(id,language)
 
-             if(data.status < 400){
+             if(data.status < 300){
                 if(data.success){
                     res.status(data.status).send({chats:data.chats, success:data.success})
                 }else{
