@@ -626,12 +626,41 @@ const UserService = {
             return {status: 400, message:"Bad Request", success:false}
         }
     },
-    changeUser : async (userId,gender,age,language)=>{
-       if(userId){
+    getUserChat : async (userId,language)=>{
+        if(userId){
+            const allChats = await Chats.find()
+            const userChats = allChats.filter(c => c.userId === userId)
+
+            if(userChats.length > 0){
+
+                return {status:200, chats:userChats}                
+
+            }else{
+                if(language){
+                    if(language === "am"){
+                        return {status:200 , message: "Դուք չունեք պահպանված նամակագրություններ", success:false}
+                    }
+                    if(language === "en"){
+                        return {status:200 , message: "You have no saved chats", success:false}
+                    }
+                    if(language === "ru"){
+                        return {status:200 , message: "У вас нет сохраненной переписки", success:false}
+                    }
+                }else{
+                    return {status: 400, message:"Bad Request", success:false}
+                }
+            }
+
+        }else{
+            return {status:400, message: "Bad Request"}
+        }
+    },
+    changeUser : async (token,gender,age,language)=>{
+       if(token){
         if(!gender && !age){
             return {status: 400, message : "Bad Request"}
         }else{
-            const findUser = await User.findById(userId)
+            const findUser = await User.findOne({access_token: token})
 
             if(findUser){
                 age ? findUser.age = age : ""
@@ -660,19 +689,20 @@ const UserService = {
             }
         }
        }else{
-        return {status:400, message: "Bad Request You must send userId"}
+        return {status:400, message: "Bad Request You must send token"}
        }
     },
     addChat :async(roomId,chat,userId,language)=>{
         if(roomId,chat,userId){
             const user = await User.findById(userId)
             if(user){
+                let messageText = language === "am" ? "Նամակագրություն" : language === "ru" ? "Переписка" : "Chat"
                 const createdAt = new Date().toLocaleString()
                 const newChat =  new Chats({
                     userId,
                     roomId,
                     createdAt,
-                    chatName : createdAt,
+                    chatName : `${messageText}/${createdAt}`,
                     chat
                  })
 

@@ -82,13 +82,38 @@ const UserController = {
             res.status(500).send({message: "Internal Server Error"})
         }
     },
+    getUserChat: async (req,res)=>{
+        try {
+             const {userId} = req.body
+             const language = req.headers["accept-language"]
+
+             const data = await UserService.getUserChat(userId,language)
+
+             if(data.status < 400){
+                if(data.success){
+                    res.status(data.status).send({chats:data.chats, success:data.success})
+                }else{
+                    res.status(data.status).send({message:data.message, success:data.success})
+                }
+             }else{
+                res.status(data.status).send({message:data.message})
+             }
+
+
+            
+        } catch (error) {
+            console.error(error)
+            res.status(500).send({message: "Internal Server Error"})
+        }
+    },
     changeUser: async (req,res)=>{
         try {
             const {gender,age}= req.body
-            const {id} = req.params
+            const access_token = req?.headers?.authorization
+            const token = access_token.split(" ")[1]
             const language = req.headers["accept-language"]
 
-            const data = await UserService.changeUser(id,gender,age,language)
+            const data = await UserService.changeUser(token,gender,age,language)
 
             if(data.status === 202 || data.status === 200){
                 

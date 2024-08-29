@@ -193,7 +193,7 @@ function getRandomRoomName(length = 10) {
 
 const io = require("socket.io")(server, {
 	cors: {
-		origin: "http://localhost:8081",
+		origin: "http://localhost:3000",
 		methods: [ "GET", "POST" ]
 	}
 })
