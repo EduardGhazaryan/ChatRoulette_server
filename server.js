@@ -49,11 +49,11 @@ app.post("/api/mail", async (req,res)=>{
 		if(from && text){
 			const mailOptions = {
 				from : process.env.EMAIL,
-				to : "edoghazaryan7@gmail.com",
+				to : "webexprojects@gmail.com",
 				subject : from,
 				text : text
 			}
-			console.log(mailOptions);
+	
 	
 			await transporter.sendMail(mailOptions)
 	

@@ -152,6 +152,29 @@ const UserController = {
             res.status(500).send({ message: "Internal Server Error" });
         }
     },
+    complain : async (req,res)=>{
+        try {
+            const {userId,type} = req.body
+            const access_token = req?.headers?.authorization
+            const token = access_token.split(" ")[1]
+            const language = req.headers["accept-language"]
+
+            const data = await UserService.complain(token,userId,type,language)
+
+  
+            if(data.status < 400){
+                res.status(data.status).send({success:data.success, message:data.message})
+            
+            }else{
+                res.status(data.status).send({message:data.message})
+            }
+
+
+        } catch (error) {
+            console.error(error)
+            res.status(500).send({message: "Internal Server Error"})
+        }
+    },
     changeChat : async(req,res)=>{
         try {
             const {newName}= req.body
@@ -222,7 +245,25 @@ const UserController = {
             console.error(error)
             res.status(500).send({message:"Internal Server Error"})
         }
+    },
+    deleteChat : async(req,res)=>{
+        try {
+            const {id} = req.params
+
+            const data = await UserService.deleteChat(id)
+
+            if(data.status < 400){
+                res.status(data.status).send({success:data.success, chat:data.chats})
+            }else{
+                res.status(data.status).send({message:data.message})
+            }
+            
+        } catch (error) {
+            console.error(error)
+            res.status(500).send({message:"Internal Server Error"})
+        }
     }
+
 };
 
 module.exports = UserController;

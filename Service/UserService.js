@@ -1,9 +1,15 @@
-const { default: mongoose } = require("mongoose");
 const Chats = require("../Model/Chats.js");
 const OnlineUsers  = require("../Model/OnlineUsers.js");
 const User = require("../Model/User.js");
+const nodemailer = require("nodemailer")
 
-
+const transporter =  nodemailer.createTransport({
+	service : "gmail",
+	auth : {
+		user : process.env.EMAIL,
+		pass : process.env.PASSWORD
+	}
+})
 
 const UserService = {
     search: async (gender, maxAge, minAge,userId,socketID,language)=>{
@@ -633,7 +639,6 @@ const UserService = {
             const userChats = allChats.filter(c => c.userId == userId)
             
             if(userChats.length > 0){
-                console.log("server--",userChats);
 
                 return {status:200, chats:userChats, success:true}                
 
@@ -734,6 +739,58 @@ const UserService = {
 
         }else{
             return {status:400, message:"Bad Request"}
+        }
+    },
+    complain : async (token,userId,type,language)=>{
+        if(token,userId,type){
+            const boxoqox = await User.findOne({access_token:token})
+            const xuligan = await User.findById(userId)
+
+            let text
+
+            if(language){
+                if(language === "am"){
+                    text = `Ուղարկող – ${boxoqox.nickname} \nՊատճառ – ${type} \nՈւղված է – ${xuligan.nickname} `
+                }
+                if(language === "ru"){
+                    text = `Отправитель – ${boxoqox.nickname} \nПричина – ${type} \nАдресовано – ${xuligan.nickname} `
+                }
+                if(language === "en"){
+                    text = `Sender – ${boxoqox.nickname} \nReason – ${type} \nAddressed to – ${xuligan.nickname} `
+                }
+            }else{
+                text = `Sender – ${boxoqox.nickname} \nReason – ${type} \nAddressed to – ${xuligan.nickname} `
+            }
+
+            if(xuligan){
+                const mailOptions = {
+                    from : process.env.EMAIL,
+                    to : "webexprojects@gmail.com",
+                    subject : type,
+                    text : text
+                }
+        
+        
+                await transporter.sendMail(mailOptions)
+        
+                if(language){
+                    if(language === "am"){
+                         return {status:201 ,message:"Ձեր նամակը հաջողությամ ուղարկվել է ", success:true}
+                    }
+                    if(language === "ru"){
+                        return {status: 201,message:"Ваше электронное письмо было успешно отправлено", success:true}
+                    }
+                    if(language === "en"){
+                        return {status: 201,message:"Your email has been successfully sent", success:true}
+                    }
+                }else{
+                    return {status: 201,message:"Your email has been successfully sent", success:true}
+                }
+            }else{
+                return {status: 404, message:"Invalid ID"}
+            }
+        }else{
+            return {status: 400, message: "Bad Request"}
         }
     },
     changeChat : async (chatId,newName,language)=>{
@@ -838,6 +895,29 @@ const UserService = {
            
         }else{
             return {status: 400, message : "Bad Request"}
+        }
+    },
+    deleteChat : async (id)=>{
+        if(id){
+            const chat = await Chats.findById(id)
+
+            if(chat){
+                const userId = chat.userId
+                const remove = await Chats.findByIdAndDelete(id)
+
+                const findChats = await Chats.find({userId})
+                
+                if(findChats.length > 0){
+                    return {status: 200, success:true, chats: findChats}
+                }else{
+                    return {status: 200, success:true, chats: []}
+                }
+
+            }else{
+                return {status:404, message: "Invalid Id Chat Not Found"}
+            }
+        }else{
+            return {status:400, message: "Bad Request"}
         }
     }
 };

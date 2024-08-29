@@ -18,9 +18,13 @@ UserRouter.post("/addChat", UserController.addChat)
 
 UserRouter.post("/stopSearch", UserController.stopSearch)
 
+UserRouter.post("/complain", UserController.complain)
+
 UserRouter.put("/changeUser", UserController.changeUser)
 
 UserRouter.put("/chat/:id", UserController.changeChat)
+
+UserRouter.delete("/chat/:id", UserController.deleteChat)
 
 
 module.exports = UserRouter;
