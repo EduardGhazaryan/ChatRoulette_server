@@ -11,6 +11,15 @@ const transporter =  nodemailer.createTransport({
 	}
 })
 
+const getCurrentDate = () => {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so we add 1
+    const year = today.getFullYear();
+  
+    return `${day}/${month}/${year}`;
+  };
+
 const UserService = {
     search: async (gender, maxAge, minAge,userId,socketID,language)=>{
         let newUser = null
@@ -705,7 +714,7 @@ const UserService = {
             if(user){
                 console.log("save----",chat);
                 let messageText = language === "am" ? "Նամակագրություն" : language === "ru" ? "Переписка" : "Chat"
-                const createdAt = new Date().toLocaleString()
+                const createdAt = getCurrentDate()
                 const newChat =  new Chats({
                     userId,
                     roomId,

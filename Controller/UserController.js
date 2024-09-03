@@ -13,7 +13,7 @@ const UserController = {
             const myGender = gender ? gender : null
             
        
-        
+            console.log("searchController------",socketID);
             
             let data = await UserService.search(myGender,myMaxAge,myMinAge,id,socketID,language);
             let count = 0
