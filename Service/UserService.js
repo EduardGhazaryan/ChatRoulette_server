@@ -14,7 +14,7 @@ const transporter =  nodemailer.createTransport({
 const UserService = {
     search: async (gender, maxAge, minAge,userId,socketID,language)=>{
         let newUser = null
-       
+       console.log("socket---",socketID);
         if(userId,socketID){
             let findOnline = await OnlineUsers.findOne({user:userId}).populate(['user'])
 
@@ -703,6 +703,7 @@ const UserService = {
         if(roomId,chat,userId){
             const user = await User.findById(userId)
             if(user){
+                console.log("save----",chat);
                 let messageText = language === "am" ? "Նամակագրություն" : language === "ru" ? "Переписка" : "Chat"
                 const createdAt = new Date().toLocaleString()
                 const newChat =  new Chats({

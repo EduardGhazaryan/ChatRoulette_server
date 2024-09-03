@@ -254,7 +254,7 @@ io.on("connection", (socket) => {
 				peerId: socket.id,
 				all_users: newRoomConnect
 			})
-			console.log("join------", newRoomConnect);
+			console.log("room_joined------", newRoomConnect);
 		
 			const findOnlineUser = await OnlineUsers.findOne({user: payload.userId})
 
