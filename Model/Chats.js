@@ -8,11 +8,11 @@ const ChatsSchema = new mongoose.Schema(
         chatName: {type:String},
         chat:  [{
                     userId: {type:String},
-                    messageId: {type:String},
+                    messageID: {type:String},
                     messageTime: {type:String},
                     content: {type:String},
-                    img: {type:String},
-                    voice : {type:String}
+                    imageUrl: {type:String},
+                    voiceUrl : {type:String}
                 }]
         
         
