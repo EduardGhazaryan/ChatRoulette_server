@@ -6,16 +6,17 @@ const UserController = {
   
             const { gender, maxAge, minAge,socketID } = req.query;
             const {id} = req.params
-            const language = req.headers["accept-language"]
+            const language = req.headers["accept-language"] ? req.headers["accept-language"] : null
    
             const myMinAge = minAge ? minAge : null
             const myMaxAge = maxAge ? maxAge : null
             const myGender = gender ? gender : null
+            const mySocketID = socketID ? socketID : null
             
        
-            console.log("searchController------",socketID);
             
-            let data = await UserService.search(myGender,myMaxAge,myMinAge,id,socketID,language);
+            
+            let data = await UserService.search(myGender,myMaxAge,myMinAge,id,mySocketID,language);
             let count = 0
            
             
@@ -32,7 +33,7 @@ const UserController = {
                             res.status(data.status).send({user:data.user, success:data.success})
                             clearInterval(interval)
                         }else{
-                            let data2 = await UserService.search(myGender,myMaxAge,myMinAge,id,language);
+                            let data2 = await UserService.search(myGender,myMaxAge,myMinAge,id,mySocketID,language);
                             data = data2
                             count++
                         }

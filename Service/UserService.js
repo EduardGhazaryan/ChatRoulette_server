@@ -23,7 +23,7 @@ const getCurrentDate = () => {
 const UserService = {
     search: async (gender, maxAge, minAge,userId,socketID,language)=>{
         let newUser = null
-       console.log("socket---",socketID);
+       
         if(userId,socketID){
             let findOnline = await OnlineUsers.findOne({user:userId}).populate(['user'])
 
