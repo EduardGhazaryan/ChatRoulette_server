@@ -153,7 +153,7 @@ cron.schedule('*/30 * * * * *', async () => {
 
 	//  console.log({message: "notif time",token:user.firebaseToken,user},);
 
-	// sendPushNotification(user.firebaseToken)
+	sendPushNotification(user.firebaseToken)
 	});
   });
 
