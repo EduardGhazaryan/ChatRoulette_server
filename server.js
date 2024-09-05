@@ -90,16 +90,18 @@ let tokens = [];
 app.post('/api/save-token', async (req, res) => {
 	try {
 		const { token,phoneID } = req.body;
-	if (token && !tokens.includes(token)) {
+		
+	if (token && phoneID) {
+		console.log(phoneID);
 		const findUser = await User.findOne({phoneID})
 		if(findUser){
 			findUser.firebaseToken = token
 			await findUser.save()
 			tokens.push(token);
 	  		console.log('Token saved:', token);
-			res.status(201).send({message:"OK"})
+			  res.sendStatus(201)
 		}else{
-			res.status(404).send({message:"Invalid phoneID"})
+			res.sendStatus(404)
 		}
 	}
 	
