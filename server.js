@@ -9,6 +9,7 @@ const nodemailer = require("nodemailer")
 const uuid = require("uuid")
 const { v4: uuidv4 } = require('uuid');
 const multer = require("multer")
+const cron = require("node-cron")
 
 
 const CorsOptions = require("./Config/CorsOptions.js")
@@ -86,13 +87,26 @@ app.post("/api/mail", async (req,res)=>{
 let tokens = []; 
 
 
-app.post('/api/save-token', (req, res) => {
-	const { token } = req.body;
+app.post('/api/save-token', async (req, res) => {
+	try {
+		const { token,phoneID } = req.body;
 	if (token && !tokens.includes(token)) {
-	  tokens.push(token);
-	  console.log('Token saved:', token);
+		const findUser = await User.findOne({phoneID})
+		if(findUser){
+			findUser.firebaseToken = token
+			await findUser.save()
+			tokens.push(token);
+	  		console.log('Token saved:', token);
+			res.status(201).send({message:"OK"})
+		}else{
+			res.status(404).send({message:"Invalid phoneID"})
+		}
 	}
-	res.sendStatus(200);
+	
+	} catch (error) {
+		console.error(error)
+		res.status(500).send({message:"Internal Server Error"})
+	}
   });
 
 
@@ -122,11 +136,26 @@ const sendPushNotification = (token) => {
   };
   
   // Send notifications every 30 seconds
-  setInterval(() => {
-	tokens.forEach(token => {
-	  sendPushNotification(token);
+//   setInterval(() => {
+// 	tokens.forEach(token => {
+// 	  sendPushNotification(token);
+// 	});
+//   }, 30000);
+
+cron.schedule('*/30 * * * * *', async () => {
+	const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+	
+	// Find users who haven't logged in within the last 24 hours
+	const inactiveUsers = await User.find({ lastLogin: { $lt: twentyFourHoursAgo } });
+  
+	inactiveUsers.forEach(user => {
+	//   sendNotification(user); // Function to send the notification
+
+	//  console.log({message: "notif time",token:user.firebaseToken,user},);
+
+	// sendPushNotification(user.firebaseToken)
 	});
-  }, 30000);
+  });
 
 
 //-----------------------Firebase end----------------

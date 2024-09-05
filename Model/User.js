@@ -11,7 +11,9 @@ const UserSchema = new mongoose.Schema(
         chats: [{ type: mongoose.Schema.Types.ObjectId, ref: "Chats" }],
         bonus : {type:Number, default:0},
         phoneID: {type:String,required:true},
-        access_token: {type:String, required:true}
+        access_token: {type:String, required:true},
+        lastLogin: {type:Date},
+        firebaseToken: {type: String, default:null}
     },
     {
         timestamps: true

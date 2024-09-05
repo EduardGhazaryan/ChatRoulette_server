@@ -35,13 +35,15 @@ const AuthService = {
                 }
           
                 const access_token = generateAccessToken(userObj);
+                const loginTime = new Date();
                 const newUser = new User({
                     age,
                     gender,
                     nickname,
                     socketID,
                     phoneID,
-                    access_token
+                    access_token,
+                    lastLogin: loginTime 
                 });
 
 
@@ -77,9 +79,10 @@ const AuthService = {
             if(findUser){
                 if(findUser.phoneID === phoneID){
                    
-                  
+                        const loginTime = new Date();
                         findUser.status = "online"
                         findUser.socketID = socketID
+                        findUser.lastLogin = loginTime
                        
                         await findUser.save()
 
@@ -145,8 +148,11 @@ const AuthService = {
             const findUser = await User.findOne({access_token :token})
 
             if(findUser){
+                const loginTime = new Date();
                 findUser.status = "online"
                 findUser.socketID = socketID
+                findUser.lastLogin = loginTime
+                
                 await findUser.save()
 
                 if(language){
