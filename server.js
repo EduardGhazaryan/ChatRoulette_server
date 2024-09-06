@@ -92,13 +92,13 @@ app.post('/api/save-token', async (req, res) => {
 		const { token,phoneID } = req.body;
 		
 	if (token && phoneID) {
-		console.log(phoneID);
+	
 		const findUser = await User.findOne({phoneID})
 		if(findUser){
 			findUser.firebaseToken = token
 			await findUser.save()
 			tokens.push(token);
-	  		console.log('Token saved:', token);
+	  		
 			  res.sendStatus(201)
 		}else{
 			res.sendStatus(404)
@@ -238,7 +238,7 @@ io.on("connection", (socket) => {
 	if (!users[socket.id]) {
 		users[socket.id] = socket.id;
 	}
-	console.log("connected", socket.id);
+
 	socket.emit("me", socket.id)
 	
 	
@@ -269,7 +269,7 @@ io.on("connection", (socket) => {
 		// let roomClients 
 		// let numberOfClients 
 		userName_cookie = payload.socketID
-		console.log("join-----",payload);
+
 		const findChat = newRoomConnect.find((chat)=> chat.roomMembers.includes(payload.socketID) && chat.roomMembers.includes(payload.participant))
 
 		if(findChat){
@@ -285,7 +285,7 @@ io.on("connection", (socket) => {
 				peerId: socket.id,
 				all_users: newRoomConnect
 			})
-			console.log("room_joined------", newRoomConnect);
+	
 		
 			const findOnlineUser = await OnlineUsers.findOne({user: payload.userId})
 
@@ -305,7 +305,7 @@ io.on("connection", (socket) => {
 				//  numberOfClients = roomClients.size
 
 			socket.join(roomId)
-			console.log(`Creating room ${roomId} and emitting room_created socket event`)
+
 			// all_connected_users.push({
 			// 	room_id: roomId,
 			// 	room_members: [userName_cookie]
@@ -326,6 +326,7 @@ io.on("connection", (socket) => {
 		
 
 		socket.on('message', async (message) => {
+			console.log("new-message----",message);
 			const now = new Date();
 			const hours = now.getHours().toString().padStart(2, '0');
 			const minutes = now.getMinutes().toString().padStart(2, '0');
@@ -358,15 +359,13 @@ io.on("connection", (socket) => {
 			
 
 
-			console.log("newRoomConnect", newRoomConnect);
-			console.log("countUser", userCount);
 			let id = generateUniqueId()
 			io.to(roomId).emit('createMessage', {...message, messageID: id, messageTime });
 		});
 		
 		socket.on('image_upload', (data) => {
 			const buffer = Buffer.from(data.image, 'base64');
-			console.log("image-data-------",data);
+			console.log("image----", data);
 			const now = new Date();
 			const hours = now.getHours().toString().padStart(2, '0');
 			const minutes = now.getMinutes().toString().padStart(2, '0');
@@ -387,6 +386,7 @@ io.on("connection", (socket) => {
 			  }
 			});
 			const imageUrl = `/uploads/${fileName}`;
+			console.log("imageURL------", imageUrl);
 			io.to(roomId).emit('receive_image', { imageUrl,userId:data.userId, socketID:data.socketID, messageTime , messageID:id});
 		  });
 		socket.on('end_chat',async (info)=>{
@@ -401,7 +401,7 @@ io.on("connection", (socket) => {
 								console.error('Error deleting the file:', err);
 								return;
 							}
-							console.log('File deleted successfully');
+						
 						});
 					}
 					if(el.voice){
@@ -410,7 +410,7 @@ io.on("connection", (socket) => {
 								console.error('Error deleting the file:', err);
 								return;
 							}
-							console.log('File deleted successfully');
+						
 						});
 					}
 				})
