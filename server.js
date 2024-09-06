@@ -360,6 +360,7 @@ io.on("connection", (socket) => {
 
 
 			let id = generateUniqueId()
+			console.log("gnacox message-----");
 			io.to(roomId).emit('createMessage', {...message, messageID: id, messageTime });
 		});
 		
