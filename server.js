@@ -268,6 +268,9 @@ io.on("connection", (socket) => {
 
 	socket.on("join", async (payload,) => {
 		let roomId = getRandomRoomName()
+
+		socket.removeAllListeners('message');
+  socket.removeAllListeners('image_upload');
 		// let roomClients 
 		// let numberOfClients 
 		userName_cookie = payload.socketID
@@ -396,28 +399,28 @@ io.on("connection", (socket) => {
 			findRoom = newRoomConnect.find((r)=> r.roomId === info.roomId)
 			let participantID = findRoom?.roomMembers?.find((u)=> u !== info.socketID)
 
-			if(info.chat){
-				info.chat.map(el=>{
-					if(el.img){
-						fs.unlink(`${img}`, (err) => {
-							if (err) {
-								console.error('Error deleting the file:', err);
-								return;
-							}
+			// if(info.chat){
+			// 	info.chat.map(el=>{
+			// 		if(el.img){
+			// 			fs.unlink(`${img}`, (err) => {
+			// 				if (err) {
+			// 					console.error('Error deleting the file:', err);
+			// 					return;
+			// 				}
 						
-						});
-					}
-					if(el.voice){
-						fs.unlink(`${voice}`, (err) => {
-							if (err) {
-								console.error('Error deleting the file:', err);
-								return;
-							}
+			// 			});
+			// 		}
+			// 		if(el.voice){
+			// 			fs.unlink(`${voice}`, (err) => {
+			// 				if (err) {
+			// 					console.error('Error deleting the file:', err);
+			// 					return;
+			// 				}
 						
-						});
-					}
-				})
-			}
+			// 			});
+			// 		}
+			// 	})
+			// }
 
 			const findOnlineUser = await OnlineUsers.findOne({user: info.userId})
 
