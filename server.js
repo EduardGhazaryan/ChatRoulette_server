@@ -223,6 +223,8 @@ function getRandomRoomName(length = 10) {
 
 
 const io = require("socket.io")(server, {
+	pingInterval: 25000, // Interval for sending pings (default: 25,000 ms)
+  	pingTimeout: 60000, 
 	cors: {
 		origin: "http://localhost:3000",
 		methods: [ "GET", "POST" ]
