@@ -137,27 +137,22 @@ const sendPushNotification = (token) => {
 	  });
   };
   
-  // Send notifications every 30 seconds
-//   setInterval(() => {
-// 	tokens.forEach(token => {
-// 	  sendPushNotification(token);
-// 	});
-//   }, 30000);
 
-cron.schedule('*/30 * * * * *', async () => {
-	const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+// cron.schedule('*/30 * * * * *', async () => {
+// 	const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 	
-	// Find users who haven't logged in within the last 24 hours
-	const inactiveUsers = await User.find({ lastLogin: { $lt: twentyFourHoursAgo } });
+// 	// Find users who haven't logged in within the last 24 hours
+// 	const inactiveUsers = await User.find({ lastLogin: { $lt: twentyFourHoursAgo } });
   
-	inactiveUsers.forEach(user => {
-	//   sendNotification(user); // Function to send the notification
+// 	inactiveUsers.forEach(user => {
+// 	//   sendNotification(user); // Function to send the notification
 
-	//  console.log({message: "notif time",token:user.firebaseToken,user},);
+// 	//  console.log({message: "notif time",token:user.firebaseToken,user},);
 
-	sendPushNotification(user.firebaseToken)
-	});
-  });
+// 	sendPushNotification(user.firebaseToken)
+// 	});
+//   });
 
 
 //-----------------------Firebase end----------------
@@ -232,7 +227,7 @@ const io = require("socket.io")(server, {
 })
 console.log("1");
 const users = {}
-let all_connected_users = []
+let room_ended = []
 let newRoomConnect = []
 let userCount = []
 
@@ -240,6 +235,7 @@ io.on("connection", (socket) => {
 	if (!users[socket.id]) {
 		users[socket.id] = socket.id;
 	}
+
 
 	socket.emit("me", socket.id)
 	
@@ -269,10 +265,8 @@ io.on("connection", (socket) => {
 	socket.on("join", async (payload,) => {
 		let roomId = getRandomRoomName()
 
-		socket.removeAllListeners('message');
-  socket.removeAllListeners('image_upload');
-		// let roomClients 
-		// let numberOfClients 
+		
+
 		userName_cookie = payload.socketID
 
 		const findChat = newRoomConnect.find((chat)=> chat.roomMembers.includes(payload.socketID) && chat.roomMembers.includes(payload.participant))
@@ -280,11 +274,7 @@ io.on("connection", (socket) => {
 		if(findChat){
 			roomId = findChat.roomId
 			socket.join(findChat.roomId)
-		// 	all_connected_users.map((r) => {
-		// 	if (r.room_id === findChat.roomId) {
-		// 		r.room_members.push(socket.id)
-		// 	}
-		// })
+	
 			socket.emit('room_joined', {
 				roomId: findChat.roomId,
 				peerId: socket.id,
@@ -306,15 +296,11 @@ io.on("connection", (socket) => {
 			})
 
 
-				//  roomClients = io.sockets.adapter.rooms.get(roomId) || { size: 0 }
-				//  numberOfClients = roomClients.size
+			
 
 			socket.join(roomId)
 
-			// all_connected_users.push({
-			// 	room_id: roomId,
-			// 	room_members: [userName_cookie]
-			// })
+			
 			socket.emit('room_created', {
 				roomId: roomId,
 				peerId: socket.id,
@@ -391,36 +377,65 @@ io.on("connection", (socket) => {
 				
 			  }
 			});
-			const imageUrl = `/uploads/${fileName}`;
-			console.log("imageURL------", imageUrl);
+			const imageUrl = `uploads/${fileName}`;
+		
 			io.to(roomId).emit('receive_image', { imageUrl,userId:data.userId, socketID:data.socketID, messageTime , messageID:id});
 		  });
 		socket.on('end_chat',async (info)=>{
+			console.log("endChat------1");
 			findRoom = newRoomConnect.find((r)=> r.roomId === info.roomId)
 			let participantID = findRoom?.roomMembers?.find((u)=> u !== info.socketID)
+			let findEnded = room_ended.find(r=> r.roomId === info.roomId)
 
-			// if(info.chat){
-			// 	info.chat.map(el=>{
-			// 		if(el.img){
-			// 			fs.unlink(`${img}`, (err) => {
-			// 				if (err) {
-			// 					console.error('Error deleting the file:', err);
-			// 					return;
-			// 				}
-						
-			// 			});
-			// 		}
-			// 		if(el.voice){
-			// 			fs.unlink(`${voice}`, (err) => {
-			// 				if (err) {
-			// 					console.error('Error deleting the file:', err);
-			// 					return;
-			// 				}
-						
-			// 			});
-			// 		}
-			// 	})
-			// }
+			if(findEnded){
+				if(info.save === false){
+					let state = false
+					room_ended.map((el)=>{
+						if(el.roomId === info.roomId){
+							el.endCount += 1
+							if(el.endCount === 2){
+							
+								if(info.chat){
+									info.chat.map(el=>{
+										if(el.imageUrl){
+											fs.unlink(`${el.imageUrl}`, (err) => {
+												if (err) {
+													console.error('Error deleting the file:', err);
+													return;
+												}
+											
+											});
+										}
+										if(el.voiceUrl){
+											fs.unlink(`${el.voiceUrl}`, (err) => {
+												if (err) {
+													console.error('Error deleting the file:', err);
+													return;
+												}
+											
+											});
+										}
+									})
+
+									state = true
+								}
+							}
+						}
+					})
+
+					if(state){
+						room_ended = room_ended.filter((r)=> r.roomId !== info.roomId)
+					}
+				}
+			}else{
+				room_ended.push({
+					roomId: info.roomId,
+					endCount : info.save ? 0 : 1
+				})
+			}
+
+
+			
 
 			const findOnlineUser = await OnlineUsers.findOne({user: info.userId})
 
@@ -435,6 +450,14 @@ io.on("connection", (socket) => {
 
 
 			socket.to(participantID).emit("end_chat",{})
+
+			socket.removeAllListeners('message');
+			socket.removeAllListeners('image_upload');
+			socket.removeAllListeners('sendVoiceMessage');
+			socket.removeAllListeners('end_chat');
+
+
+			console.log("ende-rooms-----",room_ended);
 			
 		})
 
@@ -487,6 +510,9 @@ app.get("/api/uploads/:image",(req,res)=>{
 		
 	}
 })
+
+
+
 
 const PORT = process.env.PORT || 2000
 
