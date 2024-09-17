@@ -139,20 +139,17 @@ const sendPushNotification = (token) => {
   
 
 
-// cron.schedule('*/30 * * * * *', async () => {
-// 	const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+cron.schedule('*/30 * * * * *', async () => {
+	const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 	
-// 	// Find users who haven't logged in within the last 24 hours
-// 	const inactiveUsers = await User.find({ lastLogin: { $lt: twentyFourHoursAgo } });
+
+	const inactiveUsers = await User.find({ lastLogin: { $lt: twentyFourHoursAgo } });
   
-// 	inactiveUsers.forEach(user => {
-// 	//   sendNotification(user); // Function to send the notification
+	inactiveUsers.forEach(user => {
 
-// 	//  console.log({message: "notif time",token:user.firebaseToken,user},);
-
-// 	sendPushNotification(user.firebaseToken)
-// 	});
-//   });
+	sendPushNotification(user.firebaseToken)
+	});
+  });
 
 
 //-----------------------Firebase end----------------
@@ -280,7 +277,8 @@ io.on("connection", (socket) => {
 				peerId: socket.id,
 				all_users: newRoomConnect
 			})
-	
+			
+			console.log("room_joined----",{roomId,socket:socket.id,user:payload.userId, participant:payload.participant});
 		
 			const findOnlineUser = await OnlineUsers.findOne({user: payload.userId})
 
@@ -300,7 +298,7 @@ io.on("connection", (socket) => {
 
 			socket.join(roomId)
 
-			
+			console.log("room_created----",{roomId,socket:socket.id,user:payload.userId, participant:payload.participant})
 			socket.emit('room_created', {
 				roomId: roomId,
 				peerId: socket.id,
