@@ -380,7 +380,7 @@ io.on("connection", (socket) => {
 			io.to(roomId).emit('receive_image', { imageUrl,userId:data.userId, socketID:data.socketID, messageTime , messageID:id});
 		  });
 		socket.on('end_chat',async (info)=>{
-			console.log("endChat------1");
+			
 			findRoom = newRoomConnect.find((r)=> r.roomId === info.roomId)
 			let participantID = findRoom?.roomMembers?.find((u)=> u !== info.socketID)
 			let findEnded = room_ended.find(r=> r.roomId === info.roomId)
@@ -447,7 +447,7 @@ io.on("connection", (socket) => {
 			newRoomConnect = newRoomConnect.filter((r)=>r.roomId !== info.roomId)
 
 
-			socket.to(participantID).emit("end_chat",{})
+			socket.to(participantID).emit("end_chat",{message: "Zrucakicy lqec chaty"})
 
 			socket.removeAllListeners('message');
 			socket.removeAllListeners('image_upload');
