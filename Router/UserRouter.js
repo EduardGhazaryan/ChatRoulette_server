@@ -14,7 +14,7 @@ UserRouter.get("/getChats/:id", UserController.getUserChat)
 
 UserRouter.put("/changeBonus",UserController.changeBonus)
 
-UserRouter.post("/addChat", UserController.addChat)
+// UserRouter.post("/addChat", UserController.addChat)
 
 UserRouter.post("/stopSearch", UserController.stopSearch)
 

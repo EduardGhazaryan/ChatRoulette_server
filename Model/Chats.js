@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const ChatsSchema = new mongoose.Schema(
     {
         userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        participantId: { type: mongoose.Schema.Types.ObjectId},
         roomId: { type: String, required:true },
         createdAt: {type:String},
         chatName: {type:String},

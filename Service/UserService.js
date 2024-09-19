@@ -708,49 +708,49 @@ const UserService = {
         return {status:400, message: "Bad Request You must send token"}
        }
     },
-    addChat :async(roomId,chat,userId,language)=>{
-        if(roomId,chat,userId){
-            const user = await User.findById(userId)
-            if(user){
-                console.log("save----",chat);
-                let messageText = language === "am" ? "Նամակագրություն" : language === "ru" ? "Переписка" : "Chat"
-                const createdAt = getCurrentDate()
-                const newChat =  new Chats({
-                    userId,
-                    roomId,
-                    createdAt,
-                    chatName : `${messageText}/${createdAt}`,
-                    chat
-                 })
+    // addChat :async(roomId,chat,userId,language)=>{
+    //     if(roomId,chat,userId){
+    //         const user = await User.findById(userId)
+    //         if(user){
+    //             console.log("save----",chat);
+    //             let messageText = language === "am" ? "Նամակագրություն" : language === "ru" ? "Переписка" : "Chat"
+    //             const createdAt = getCurrentDate()
+    //             const newChat =  new Chats({
+    //                 userId,
+    //                 roomId,
+    //                 createdAt,
+    //                 chatName : `${messageText}/${createdAt}`,
+    //                 chat
+    //              })
 
-                await newChat.save()
+    //             await newChat.save()
 
-                user.chats = [...user.chats,newChat._id]
-                user.save()
+    //             user.chats = [...user.chats,newChat._id]
+    //             user.save()
 
-                return {status:201,message:"Chat was added",success:true}
-            }else{
-                if(language){
-                    if(language === "am"){
-                        return {status: 200, message: "Օգտատերը չի գտնվել", success:false}
-                    }
-                    if(language === "ru"){
-                        return {status: 200, message: "Пользователь не найден", success:false}
-                    }
-                    if(language === "en"){
-                        return {status: 200, message: "User Not Found", success:false}
-                    }
-                }else{
-                    return {status: 200, message: "User Not Found", success:false}
-                }
-            }
+    //             return {status:201,message:"Chat was added",success:true}
+    //         }else{
+    //             if(language){
+    //                 if(language === "am"){
+    //                     return {status: 200, message: "Օգտատերը չի գտնվել", success:false}
+    //                 }
+    //                 if(language === "ru"){
+    //                     return {status: 200, message: "Пользователь не найден", success:false}
+    //                 }
+    //                 if(language === "en"){
+    //                     return {status: 200, message: "User Not Found", success:false}
+    //                 }
+    //             }else{
+    //                 return {status: 200, message: "User Not Found", success:false}
+    //             }
+    //         }
 
 
 
-        }else{
-            return {status:400, message:"Bad Request"}
-        }
-    },
+    //     }else{
+    //         return {status:400, message:"Bad Request"}
+    //     }
+    // },
     complain : async (token,userId,type,language)=>{
         if(token,userId,type){
             const boxoqox = await User.findOne({access_token:token})

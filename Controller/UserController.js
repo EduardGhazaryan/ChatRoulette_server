@@ -133,26 +133,26 @@ const UserController = {
             res.status(500).send({message: "Internal Server Error"})
         }
     },
-    addChat: async (req,res)=>{
-        try {
+    // addChat: async (req,res)=>{
+    //     try {
 
-            const {roomId,chat,userId} = req.body
-            const language = req.headers["accept-language"]
+    //         const {roomId,chat,userId} = req.body
+    //         const language = req.headers["accept-language"]
 
 
-            const data = await UserService.addChat(roomId,chat,userId, language)
+    //         const data = await UserService.addChat(roomId,chat,userId, language)
 
-            if(data.status === 400){
-                res.status(data.status).send({message:data.message})
-            }else{
-                res.status(data.status).send({message:data.message, success:data.success})
-            }
+    //         if(data.status === 400){
+    //             res.status(data.status).send({message:data.message})
+    //         }else{
+    //             res.status(data.status).send({message:data.message, success:data.success})
+    //         }
             
-        } catch (error) {
-            console.error(error);
-            res.status(500).send({ message: "Internal Server Error" });
-        }
-    },
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).send({ message: "Internal Server Error" });
+    //     }
+    // },
     complain : async (req,res)=>{
         try {
             const {userId,type} = req.body
