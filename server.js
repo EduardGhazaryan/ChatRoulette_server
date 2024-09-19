@@ -158,28 +158,28 @@ app.post("/api/user/addChat", async (req, res) => {
                   el.endCount += 1;
                   el.notSaveCount += 1;
                   if (el.endCount === 2) {
-                    if (chat) {
-                    //   chat.map((el) => {
-                    //     if (el.imageUrl) {
-                    //       fs.unlink(`${el.imageUrl}`, (err) => {
-                    //         if (err) {
-                    //           console.error("Error deleting the file:", err);
-                    //           return;
-                    //         }
-                    //       });
-                    //     }
-                    //     if (el.voiceUrl) {
-                    //       fs.unlink(`${el.voiceUrl}`, (err) => {
-                    //         if (err) {
-                    //           console.error("Error deleting the file:", err);
-                    //           return;
-                    //         }
-                    //       });
-                    //     }
-                    //   });
+                    // if (chat) {
+                    // //   chat.map((el) => {
+                    // //     if (el.imageUrl) {
+                    // //       fs.unlink(`${el.imageUrl}`, (err) => {
+                    // //         if (err) {
+                    // //           console.error("Error deleting the file:", err);
+                    // //           return;
+                    // //         }
+                    // //       });
+                    // //     }
+                    // //     if (el.voiceUrl) {
+                    // //       fs.unlink(`${el.voiceUrl}`, (err) => {
+                    // //         if (err) {
+                    // //           console.error("Error deleting the file:", err);
+                    // //           return;
+                    // //         }
+                    // //       });
+                    // //     }
+                    // //   });
 
 					
-                    }
+                    // }
 
 					fs.unlink(`uploads/${roomId}`, (err) => {
 						if (err) {
@@ -234,10 +234,44 @@ app.post("/api/user/addChat", async (req, res) => {
           } else {
             room_ended.push({
               roomId: roomId,
-              endCount: save ? 0 : 1,
-              saveCount: save ? 1 : 0,
-              notSaveCount: save ? 0 : 1,
+              endCount: save === true ? 0 : 1,
+              saveCount: save === true ? 1 : 0,
+              notSaveCount: save === true ? 0 : 1,
             });
+
+
+			if (save === true) {
+				room_ended.map((el) => {
+				  if (el.roomId === roomId) {
+					el.saveCount += 1;
+				  }
+				});
+  
+  
+				let messageText = language === "am" ? "Նամակագրություն" : language === "ru" ? "Переписка" : "Chat";
+				const createdAt = getCurrentDate();
+			  const newChat = new Chats({
+				userId,
+				roomId,
+				participantId : participantId,
+				createdAt,
+				chatName: `${messageText}/${createdAt}`,
+				chat,
+			  });
+	  
+			  await newChat.save();
+	  
+			  user.chats = [...user.chats, newChat._id];
+			  await user.save();
+  
+  
+  
+  
+  
+  
+			  }
+
+
           }
        
 
@@ -388,15 +422,19 @@ io.on("connection", (socket) => {
 
     const findOnlineUser = await OnlineUsers.findOne({ socketID: socket.id });
 
-    if (findOnlineUser) {
-      findOnlineUser.status = "offline";
-      await findOnlineUser.save();
-    }
-    userCount = userCount.filter((u) => u.socketID !== socket.id);
+	userCount = userCount.filter((u) => u.socketID !== socket.id);
 
 	const findRoom = newRoomConnect.find(r=> r.roomMembers.includes(socket.id))
 	const participant = findRoom.roomMembers.find(r=> r !== socket.id)
 	let findEnded = room_ended.find((r) => r.roomId === findRoom.roomId);
+
+	const findParticipant = await OnlineUsers.findOne({ socketID: participant });
+
+    if (findOnlineUser) {
+      findOnlineUser.status = "offline";
+	  findParticipant.status = "offline";
+      await Promise.all([findOnlineUser.save(), findParticipant.save()]);
+    }
 
 
 
