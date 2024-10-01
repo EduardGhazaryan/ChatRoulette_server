@@ -830,20 +830,24 @@ const UserService = {
 
                 console.log("stop-service------",userId,user);
 
-                if(language){
-                    if(language === "am"){
-                        return { status: 201, message: 'Օգտատերը հաջողությամբ դուրս է եկել', success:true};
-                    }
-                    if(language === "ru"){
-                        return { status: 201, message: 'Пользователь успешно вышел из системы',success:true};
-                    }
-                    if(language === "en"){
-
+                if(user.status === "offline"){
+                    if(language){
+                        if(language === "am"){
+                            return { status: 201, message: 'Օգտատերը հաջողությամբ դուրս է եկել', success:true};
+                        }
+                        if(language === "ru"){
+                            return { status: 201, message: 'Пользователь успешно вышел из системы',success:true};
+                        }
+                        if(language === "en"){
+    
+                            return { status: 201, message: 'User logged out successfully',success:true};
+                        }
+                    }else{
                         return { status: 201, message: 'User logged out successfully',success:true};
+                        
                     }
                 }else{
-                    return { status: 201, message: 'User logged out successfully',success:true};
-                    
+                    return { status: 201, message: 'Failed to change status',success:false};
                 }
 
             }else{
