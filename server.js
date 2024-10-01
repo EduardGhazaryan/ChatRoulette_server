@@ -769,6 +769,22 @@ io.on("connection", (socket) => {
         });
       });
     });
+
+
+    socket.on("onFocus", (data) => {
+      const findRoom = newRoomConnect.find(r=> r.roomId === data.roomId)
+	    const participant = findRoom?.roomMembers?.find(r=> r !== data.socketID)
+      socket.to(participant).emit("onTyping", { isTyping: true});
+
+    })
+
+    socket.on("onBlur", (data) => {
+      const findRoom = newRoomConnect.find(r=> r.roomId === data.roomId)
+      const participant = findRoom?.roomMembers?.find(r=> r !== data.socketID)
+      socket.to(participant).emit("onTyping", { isTyping: false});
+    })
+
+
   });
 });
 
