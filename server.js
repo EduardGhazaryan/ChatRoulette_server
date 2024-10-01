@@ -611,6 +611,13 @@ io.on("connection", (socket) => {
       const seconds = now.getSeconds().toString().padStart(2, "0");
       let messageTime = `${hours}:${minutes}:${seconds}`;
 
+      const imageSizeInBytes = Buffer.byteLength(buffer);
+  
+
+  const imageSizeInMB = (imageSizeInBytes / (1024 * 1024)).toFixed(2);
+
+  console.log(`Image size: ${imageSizeInMB} MB`);
+
       let id = generateUniqueId();
 
 	  const folderPath = path.join(__dirname, "uploads", roomId);
