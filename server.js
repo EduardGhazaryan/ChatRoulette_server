@@ -617,6 +617,7 @@ io.on("connection", (socket) => {
   const imageSizeInMB = (imageSizeInBytes / (1024 * 1024)).toFixed(2);
 
   console.log(`Image size: ${imageSizeInMB} MB`);
+  console.log(`Image size: ${imageSizeInBytes} MB`);
 
       let id = generateUniqueId();
 
