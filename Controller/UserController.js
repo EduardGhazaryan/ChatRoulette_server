@@ -26,6 +26,7 @@ const UserController = {
                     if(findUser){
                         findUser.status = "offline"
                         await findUser.save()
+                        console.log("offline----",findUser);
 
                         res.status(200).send({message: "User Offline", success: true})
                     }else{
