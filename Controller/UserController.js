@@ -2,70 +2,138 @@ const OnlineUsers = require('../Model/OnlineUsers.js');
 const UserService = require('../Service/UserService.js');
 
 const UserController = {
-    search: async (req, res) => {
-        try {
+    // search: async (req, res) => {
+    //     try {
   
-            const { gender, maxAge, minAge,socketID } = req.query;
-            const {id} = req.params
-            const language = req.headers["accept-language"] ? req.headers["accept-language"] : null
+    //         const { gender, maxAge, minAge,socketID } = req.query;
+    //         const {id} = req.params
+    //         const language = req.headers["accept-language"] ? req.headers["accept-language"] : null
    
-            const myMinAge = minAge ? minAge : null
-            const myMaxAge = maxAge ? maxAge : null
-            const myGender = gender ? gender : null
-            const mySocketID = socketID ? socketID : null
+    //         const myMinAge = minAge ? minAge : null
+    //         const myMaxAge = maxAge ? maxAge : null
+    //         const myGender = gender ? gender : null
+    //         const mySocketID = socketID ? socketID : null
             
        
             
             
-            let data = await UserService.search(myGender,myMaxAge,myMinAge,id,mySocketID,language);
-            let count = 0
+    //         let data = await UserService.search(myGender,myMaxAge,myMinAge,id,mySocketID,language);
+    //         let count = 0
            
+    //         req.on('close', async () => {
+    //             if (!res.headersSent) {  // Corrected to use res.headersSent
+    //                 try {
+    //                     const findUser = await OnlineUsers.findOne({ user: id });
+    //                     if (findUser) {
+    //                         findUser.status = "offline";
+    //                         await findUser.save();
+    //                         console.log("offline----", findUser);
+    //                     } else {
+    //                         console.log("Invalid ID: User Not Found");
+    //                     }
+    //                 } catch (error) {
+    //                     console.error("Error updating user status:", error);
+    //                 }
+    //             } else {
+    //                 console.log("Response already sent, cannot update user status.");
+    //             }
+    //         });
+            
+    //         if(data.status === 200){
+          
+    //             let interval = setInterval(async () => {
+    //                 if(count === 20){
+    //                     res.status(200).send({message: data.message, success: data.success})
+    //                     clearInterval(interval)
+    //                 }else{
+                        
+    //                     if(data.success){
+    //                         res.status(data.status).send({user:data.user, success:data.success})
+    //                         clearInterval(interval)
+    //                     }else{
+    //                         let data2 = await UserService.search(myGender,myMaxAge,myMinAge,id,mySocketID,language);
+    //                         data = data2
+    //                         count++
+    //                     }
+    //                 }
+    //             }, 1000);
+                
+    //         }else{
+    //             res.status(data.status).send({ message: data.message });
+    //         }
+    //     } catch (error) {
+    //         console.error(error);
+    //         res.status(500).send({ message: "Internal Server Error" });
+    //     }
+    // },
+
+    search: async (req, res) => {
+        try {
+            const { gender, maxAge, minAge, socketID } = req.query;
+            const { id } = req.params;
+            const language = req.headers["accept-language"] ? req.headers["accept-language"] : null;
+    
+            const myMinAge = minAge ? minAge : null;
+            const myMaxAge = maxAge ? maxAge : null;
+            const myGender = gender ? gender : null;
+            const mySocketID = socketID ? socketID : null;
+    
+            let data = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language);
+            let count = 0;
+            let interval;
+    
+            // Listen for request closure to update the user's status
             req.on('close', async () => {
-                if (!res.headersSent) {  // Corrected to use res.headersSent
-                    try {
-                        const findUser = await OnlineUsers.findOne({ user: id });
-                        if (findUser) {
-                            findUser.status = "offline";
-                            await findUser.save();
-                            console.log("offline----", findUser);
-                        } else {
-                            console.log("Invalid ID: User Not Found");
-                        }
-                    } catch (error) {
-                        console.error("Error updating user status:", error);
+                console.log('Request closed by the client');
+                clearInterval(interval);  // Clear interval if the request is closed
+    
+                try {
+                    const findUser = await OnlineUsers.findOne({ user: id });
+                    if (findUser) {
+                        findUser.status = "offline";
+                        await findUser.save();
+                        console.log("offline----", findUser);
+                    } else {
+                        console.log("Invalid ID: User Not Found");
                     }
-                } else {
-                    console.log("Response already sent, cannot update user status.");
+                } catch (error) {
+                    console.error("Error updating user status:", error);
                 }
             });
-            
-            if(data.status === 200){
-          
-                let interval = setInterval(async () => {
-                    if(count === 20){
-                        res.status(200).send({message: data.message, success: data.success})
-                        clearInterval(interval)
-                    }else{
-                        
-                        if(data.success){
-                            res.status(data.status).send({user:data.user, success:data.success})
-                            clearInterval(interval)
-                        }else{
-                            let data2 = await UserService.search(myGender,myMaxAge,myMinAge,id,mySocketID,language);
-                            data = data2
-                            count++
+    
+            if (data.status === 200) {
+                interval = setInterval(async () => {
+                    if (count === 20) {
+                        if (!res.headersSent) {
+                            res.status(200).send({ message: data.message, success: data.success });
+                        }
+                        clearInterval(interval);
+                    } else {
+                        if (data.success) {
+                            if (!res.headersSent) {
+                                res.status(data.status).send({ user: data.user, success: data.success });
+                            }
+                            clearInterval(interval);
+                        } else {
+                            let data2 = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language);
+                            data = data2;
+                            count++;
                         }
                     }
                 }, 1000);
-                
-            }else{
-                res.status(data.status).send({ message: data.message });
+            } else {
+                if (!res.headersSent) {
+                    res.status(data.status).send({ message: data.message });
+                }
             }
         } catch (error) {
             console.error(error);
-            res.status(500).send({ message: "Internal Server Error" });
+            if (!res.headersSent) {
+                res.status(500).send({ message: "Internal Server Error" });
+            }
         }
     },
+    
     getUser: async(req,res)=>{
         try {
 
