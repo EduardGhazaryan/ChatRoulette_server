@@ -401,6 +401,7 @@ const io = require("socket.io")(server, {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
+  maxHttpBufferSize: 1e7
 });
 console.log("1");
 
@@ -425,7 +426,7 @@ io.on("connection", (socket) => {
 	userCount = userCount.filter((u) => u.socketID !== socket.id);
 
 	const findRoom = newRoomConnect.find(r=> r.roomMembers.includes(socket.id))
-	const participant = findRoom.roomMembers.find(r=> r !== socket.id)
+	const participant = findRoom?.roomMembers?.find(r=> r !== socket.id)
 	let findEnded = room_ended.find((r) => r.roomId === findRoom.roomId);
 
 	const findParticipant = await OnlineUsers.findOne({ socketID: participant });
