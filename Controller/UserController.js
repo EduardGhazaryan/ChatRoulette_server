@@ -1,3 +1,4 @@
+const OnlineUsers = require('../Model/OnlineUsers.js');
 const UserService = require('../Service/UserService.js');
 
 const UserController = {
@@ -19,9 +20,17 @@ const UserController = {
             let data = await UserService.search(myGender,myMaxAge,myMinAge,id,mySocketID,language);
             let count = 0
            
-            req.on('close',()=>{
+            req.on('close',async ()=>{
                 if(!req.headersSent){
-                    console.log("request was aborted");
+                    const findUser = await OnlineUsers.findOne({user:id})
+                    if(findUser){
+                        findUser.status = "offline"
+                        await findUser.save()
+
+                        res.status(200).send({message: "User Offline", success: true})
+                    }else{
+                        res.status(404).send({message: "Invalid ID: User Not Found", success: false})
+                    }
                 }
             })
             
