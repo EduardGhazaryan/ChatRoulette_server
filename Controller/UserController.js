@@ -19,7 +19,11 @@ const UserController = {
             let data = await UserService.search(myGender,myMaxAge,myMinAge,id,mySocketID,language);
             let count = 0
            
-            
+            req.on('close',()=>{
+                if(!req.headersSent){
+                    console.log("request was aborted");
+                }
+            })
             
             if(data.status === 200){
           
@@ -220,6 +224,8 @@ const UserController = {
             }else{
                 res.status(data.status).send({message:data.message})
             }
+
+            
 
             
         } catch (error) {
