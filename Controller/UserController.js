@@ -20,20 +20,24 @@ const UserController = {
             let data = await UserService.search(myGender,myMaxAge,myMinAge,id,mySocketID,language);
             let count = 0
            
-            req.on('close',async ()=>{
-                if(!req.headersSent){
-                    const findUser = await OnlineUsers.findOne({user:id})
-                    if(findUser){
-                        findUser.status = "offline"
-                        await findUser.save()
-                        console.log("offline----",findUser);
-
-                        res.status(200).send({message: "User Offline", success: true})
-                    }else{
-                        res.status(404).send({message: "Invalid ID: User Not Found", success: false})
+            req.on('close', async () => {
+                if (!res.headersSent) {  // Corrected to use res.headersSent
+                    try {
+                        const findUser = await OnlineUsers.findOne({ user: id });
+                        if (findUser) {
+                            findUser.status = "offline";
+                            await findUser.save();
+                            console.log("offline----", findUser);
+                        } else {
+                            console.log("Invalid ID: User Not Found");
+                        }
+                    } catch (error) {
+                        console.error("Error updating user status:", error);
                     }
+                } else {
+                    console.log("Response already sent, cannot update user status.");
                 }
-            })
+            });
             
             if(data.status === 200){
           
