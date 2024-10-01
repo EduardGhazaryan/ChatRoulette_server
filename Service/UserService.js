@@ -828,6 +828,8 @@ const UserService = {
 
                 await user.save()
 
+                console.log("stop-service------",userId,user);
+
                 if(language){
                     if(language === "am"){
                         return { status: 201, message: 'Օգտատերը հաջողությամբ դուրս է եկել', success:true};
