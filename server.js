@@ -418,153 +418,206 @@ io.on("connection", (socket) => {
       roomId: data.roomId,
     });
   });
-  // socket.on("disconnect", async () => {
-  //   delete users[socket.id];
 
-  //   const findOnlineUser = await OnlineUsers.findOne({ socketID: socket.id });
+  socket.on("isSaved",(info)=>{
+    let findEnded = room_ended.find((r) => r.roomId === info.roomId);
 
-	// userCount = userCount.filter((u) => u.socketID !== socket.id);
-
-	// const findRoom = newRoomConnect.find(r=> r.roomMembers.includes(socket.id))
-	// const participant = findRoom?.roomMembers?.find(r=> r !== socket.id)
-	// let findEnded = room_ended.find((r) => r.roomId === findRoom.roomId);
-
-	// const findParticipant = await OnlineUsers.findOne({ socketID: participant });
-
-  //   if (findOnlineUser) {
-  //     findOnlineUser.status = "offline";
-	//   findParticipant.status = "offline";
-  //     await Promise.all([findOnlineUser.save(), findParticipant.save()]);
-  //   }
-
-
-
-
-	// if (findEnded) {
-	// 	let state = false;
-	// 	room_ended.map((el) => {
-	// 	  if (el.roomId === findRoom.roomId) {
-	// 		el.endCount += 1;
-	// 		el.notSaveCount += 1;
-	// 		if (el.endCount === 2) {
-	// 		  fs.unlink(`uploads/${findRoom.roomId}`, (err) => {
-	// 			  if (err) {
-	// 				console.error("Error deleting the file:", err);
-	// 				return;
-	// 			  }
-	// 			});
-
-	// 			state = true;
-	// 		}
-
-	// 		if (el.saveCount + el.notSaveCount === 2) {
-	// 		  state = true;
-	// 		}
-	// 	  }
-	// 	});
-
-	// 	if (state) {
-	// 	  room_ended = room_ended.filter((r) => r.roomId !== findRoom.roomId);
-	// 	  newRoomConnect = newRoomConnect.filter(
-	// 		(r) => !r.roomMembers.includes(socket.id)
-	// 	  );
-	// 	}
-	//   }else{
-	// 	room_ended.push({
-	// 		roomId: findRoom.roomId,
-	// 		endCount:  1,
-	// 		saveCount:  0,
-	// 		notSaveCount:  1,
-	// 	  });
-	//   }
-
-
-
-
-	//   socket.to(participant).emit("end_chat", { message: "Zrucakicy lqec chaty" });
-
-   
-
-  //   console.log("disconnect-------", socket.id);
-  // });
-
-
-  socket.on("disconnect", async () => {
-    console.log(`User ${socket.id} disconnected`);
-  
-    // Start a 1-minute timeout for reconnection
-    const reconnectionTimeout = setTimeout(async () => {
-      console.log(`User ${socket.id} failed to reconnect within 1 minute. Disconnecting.`);
-  
-      // Remove the user from the active user list
-      delete users[socket.id];
-  
-      const findOnlineUser = await OnlineUsers.findOne({ socketID: socket.id });
-  
-      // Remove user from userCount list
-      userCount = userCount.filter((u) => u.socketID !== socket.id);
-  
-      // Find the chat room the user was part of
-      const findRoom = newRoomConnect.find(r => r.roomMembers.includes(socket.id));
-      const participant = findRoom?.roomMembers?.find(r => r !== socket.id);
-      let findEnded = room_ended.find((r) => r.roomId === findRoom.roomId);
-  
-      const findParticipant = await OnlineUsers.findOne({ socketID: participant });
-  
-      if (findOnlineUser) {
-        findOnlineUser.status = "offline";
-        if (findParticipant) findParticipant.status = "offline";
-        await Promise.all([findOnlineUser.save(), findParticipant?.save()]);
-      }
-  
       if (findEnded) {
-        let state = false;
-        room_ended.map((el) => {
-          if (el.roomId === findRoom.roomId) {
-            el.endCount += 1;
-            el.notSaveCount += 1;
-            if (el.endCount === 2) {
-              fs.unlink(`uploads/${findRoom.roomId}`, (err) => {
-                if (err) {
-                  console.error("Error deleting the file:", err);
-                  return;
+        if (info.save === false) {
+          let state = false;
+          room_ended.map((el) => {
+            if (el.roomId === info.roomId) {
+              el.endCount += 1;
+              el.notSaveCount += 1;
+              if (el.endCount === 2) {
+                if (info.chat) {
+                  fs.unlink(`uploads/${info.roomId}`, (err) => {
+                    if (err) {
+                    console.error("Error deleting the file:", err);
+                    return;
+                    }
+                  });
+
+                  state = true;
                 }
-              });
-              state = true;
+              }
+
+              if (el.saveCount + el.notSaveCount === 2) {
+                state = true;
+              }
             }
-  
-            if (el.saveCount + el.notSaveCount === 2) {
-              state = true;
-            }
+          });
+
+          if (state) {
+            room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
           }
-        });
-  
-        if (state) {
-          room_ended = room_ended.filter((r) => r.roomId !== findRoom.roomId);
-          newRoomConnect = newRoomConnect.filter((r) => !r.roomMembers.includes(socket.id));
+        }
+        if (info.save === true) {
+          room_ended.map((el) => {
+            if (el.roomId === info.roomId) {
+              el.saveCount += 1;
+            }
+          });
         }
       } else {
         room_ended.push({
-          roomId: findRoom.roomId,
-          endCount: 1,
-          saveCount: 0,
-          notSaveCount: 1,
+          roomId: info.roomId,
+          endCount: info.save ? 0 : 1,
+          saveCount: info.save ? 1 : 0,
+          notSaveCount: info.save ? 0 : 1,
         });
       }
-  
-      // Notify the participant that the chat has ended
-      socket.to(participant).emit("end_chat", { message: "Chat ended due to disconnection" });
-  
-      console.log("User fully disconnected after timeout", socket.id);
-  
-    }, 60000); // 1 minute = 60,000 milliseconds
-  
-    // If the user reconnects within 1 minute, clear the timeout
-    socket.on("reconnect", () => {
-      clearTimeout(reconnectionTimeout);
-      console.log(`User ${socket.id} reconnected within 1 minute.`);
-    });
+  })
+
+
+
+  socket.on("disconnect", async () => {
+    delete users[socket.id];
+
+    const findOnlineUser = await OnlineUsers.findOne({ socketID: socket.id });
+
+	userCount = userCount.filter((u) => u.socketID !== socket.id);
+
+	const findRoom = newRoomConnect.find(r=> r.roomMembers.includes(socket.id))
+	const participant = findRoom?.roomMembers?.find(r=> r !== socket.id)
+	let findEnded = room_ended.find((r) => r.roomId === findRoom.roomId);
+
+	const findParticipant = await OnlineUsers.findOne({ socketID: participant });
+
+    if (findOnlineUser) {
+      findOnlineUser.status = "offline";
+	  findParticipant.status = "offline";
+      await Promise.all([findOnlineUser.save(), findParticipant.save()]);
+    }
+
+
+
+
+	if (findEnded) {
+		let state = false;
+		room_ended.map((el) => {
+		  if (el.roomId === findRoom.roomId) {
+			el.endCount += 1;
+			el.notSaveCount += 1;
+			if (el.endCount === 2) {
+			  fs.unlink(`uploads/${findRoom.roomId}`, (err) => {
+				  if (err) {
+					console.error("Error deleting the file:", err);
+					return;
+				  }
+				});
+
+				state = true;
+			}
+
+			if (el.saveCount + el.notSaveCount === 2) {
+			  state = true;
+			}
+		  }
+		});
+
+		if (state) {
+		  room_ended = room_ended.filter((r) => r.roomId !== findRoom.roomId);
+		  newRoomConnect = newRoomConnect.filter(
+			(r) => !r.roomMembers.includes(socket.id)
+		  );
+		}
+	  }else{
+		room_ended.push({
+			roomId: findRoom.roomId,
+			endCount:  1,
+			saveCount:  0,
+			notSaveCount:  1,
+		  });
+	  }
+
+
+
+
+	  socket.to(participant).emit("end_chat", { message: "Zrucakicy lqec chaty" });
+
+   
+
+    console.log("disconnect-------", socket.id);
   });
+
+
+  // socket.on("disconnect", async () => {
+  //   console.log(`User ${socket.id} disconnected`);
+  
+  //   // Start a 1-minute timeout for reconnection
+  //   const reconnectionTimeout = setTimeout(async () => {
+  //     console.log(`User ${socket.id} failed to reconnect within 1 minute. Disconnecting.`);
+  
+  //     // Remove the user from the active user list
+  //     delete users[socket.id];
+  
+  //     const findOnlineUser = await OnlineUsers.findOne({ socketID: socket.id });
+  
+  //     // Remove user from userCount list
+  //     userCount = userCount.filter((u) => u.socketID !== socket.id);
+  
+  //     // Find the chat room the user was part of
+  //     const findRoom = newRoomConnect.find(r => r.roomMembers.includes(socket.id));
+  //     const participant = findRoom?.roomMembers?.find(r => r !== socket.id);
+  //     let findEnded = room_ended.find((r) => r.roomId === findRoom.roomId);
+  
+  //     const findParticipant = await OnlineUsers.findOne({ socketID: participant });
+  
+  //     if (findOnlineUser) {
+  //       findOnlineUser.status = "offline";
+  //       if (findParticipant) findParticipant.status = "offline";
+  //       await Promise.all([findOnlineUser.save(), findParticipant?.save()]);
+  //     }
+  
+  //     if (findEnded) {
+  //       let state = false;
+  //       room_ended.map((el) => {
+  //         if (el.roomId === findRoom.roomId) {
+  //           el.endCount += 1;
+  //           el.notSaveCount += 1;
+  //           if (el.endCount === 2) {
+  //             fs.unlink(`uploads/${findRoom.roomId}`, (err) => {
+  //               if (err) {
+  //                 console.error("Error deleting the file:", err);
+  //                 return;
+  //               }
+  //             });
+  //             state = true;
+  //           }
+  
+  //           if (el.saveCount + el.notSaveCount === 2) {
+  //             state = true;
+  //           }
+  //         }
+  //       });
+  
+  //       if (state) {
+  //         room_ended = room_ended.filter((r) => r.roomId !== findRoom.roomId);
+  //         newRoomConnect = newRoomConnect.filter((r) => !r.roomMembers.includes(socket.id));
+  //       }
+  //     } else {
+  //       room_ended.push({
+  //         roomId: findRoom.roomId,
+  //         endCount: 1,
+  //         saveCount: 0,
+  //         notSaveCount: 1,
+  //       });
+  //     }
+  
+  //     // Notify the participant that the chat has ended
+  //     socket.to(participant).emit("end_chat", { message: "Chat ended due to disconnection" });
+  
+  //     console.log("User fully disconnected after timeout", socket.id);
+  
+  //   }, 60000); // 1 minute = 60,000 milliseconds
+  
+  //   // If the user reconnects within 1 minute, clear the timeout
+  //   socket.on("reconnect", () => {
+  //     clearTimeout(reconnectionTimeout);
+  //     console.log(`User ${socket.id} reconnected within 1 minute.`);
+  //   });
+  // });
 
 
 
