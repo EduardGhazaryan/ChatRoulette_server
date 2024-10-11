@@ -340,17 +340,17 @@ const sendPushNotification = (token) => {
     });
 };
 
-cron.schedule("*/30 * * * * *", async () => {
-  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+// cron.schedule("*/30 * * * * *", async () => {
+//   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-  const inactiveUsers = await User.find({
-    lastLogin: { $lt: twentyFourHoursAgo },
-  });
+//   const inactiveUsers = await User.find({
+//     lastLogin: { $lt: twentyFourHoursAgo },
+//   });
 
-  inactiveUsers.forEach((user) => {
-    sendPushNotification(user.firebaseToken);
-  });
-});
+//   inactiveUsers.forEach((user) => {
+//     sendPushNotification(user.firebaseToken);
+//   });
+// });
 
 //-----------------------Firebase end----------------
 
@@ -421,7 +421,7 @@ io.on("connection", (socket) => {
 
   socket.on("isSaved",(info)=>{
     let findEnded = room_ended.find((r) => r.roomId === info.roomId);
-
+    console.log("isSaved-------",info);
       if (findEnded) {
         if (info.save === false) {
           let state = false;
