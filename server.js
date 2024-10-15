@@ -395,7 +395,7 @@ function generateUniqueId() {
 }
 
 
-let interval = null
+
 
 const io = require("socket.io")(server, {
   pingInterval: 25000, // Interval for sending pings (default: 25,000 ms)
@@ -412,6 +412,7 @@ io.on("connection", (socket) => {
   if (!users[socket.id]) {
     users[socket.id] = socket.id;
   }
+  let interval = null
 
   socket.emit("me", socket.id);
 
