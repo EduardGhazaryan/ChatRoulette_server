@@ -912,6 +912,7 @@ io.on("connection", (socket) => {
 	
 			await newChat.save();
 	
+      console.log("isSaved-rooms-----", user);
 			user.chats = [...user.chats, newChat._id];
 			await user.save();
 
