@@ -926,7 +926,8 @@ io.on("connection", (socket) => {
 
         if(findEnd.endCount === 2){
           if(findEnd.notSaveCount === 2){
-            fs.unlink(`uploads/${info.roomId}`, (err) => {
+            console.log("isFinded---------", findEnd);
+            fs.unlink(`uploads/${findEnd.roomId}`, (err) => {
               if (err) {
               console.error("Error deleting the file:", err);
               return;
