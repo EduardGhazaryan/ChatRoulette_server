@@ -927,12 +927,14 @@ io.on("connection", (socket) => {
         if(findEnd.endCount === 2){
           if(findEnd.notSaveCount === 2){
             console.log("isFinded---------", findEnd);
-            fs.unlink(`uploads/${findEnd.roomId}`, (err) => {
+            fs.rm(`uploads/${findEnd.roomId}`, { recursive: true, force: true }, (err) => {
               if (err) {
-              console.error("Error deleting the file:", err);
-              return;
+                console.error("Error deleting the folder:", err);
+                return;
               }
+              console.log("Folder successfully deleted.");
             });
+           
           }
 
           room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
@@ -1045,5 +1047,10 @@ app.get("/api/uploads/:roomId/:image", (req, res) => {
   });
 
 const PORT = process.env.PORT || 2000;
+
+
+
+
+
 
 server.listen(PORT, () => console.log(`server is running on ${PORT}`));
