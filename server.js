@@ -419,55 +419,7 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("isSaved",(info)=>{
-    let findEnded = room_ended.find((r) => r.roomId === info.roomId);
-    console.log("isSaved-------",info);
-      if (findEnded) {
-        if (info.save === false) {
-          let state = false;
-          room_ended.map((el) => {
-            if (el.roomId === info.roomId) {
-              el.endCount += 1;
-              el.notSaveCount += 1;
-              if (el.endCount === 2) {
-                if (info.chat) {
-                  fs.unlink(`uploads/${info.roomId}`, (err) => {
-                    if (err) {
-                    console.error("Error deleting the file:", err);
-                    return;
-                    }
-                  });
-
-                  state = true;
-                }
-              }
-
-              if (el.saveCount + el.notSaveCount === 2) {
-                state = true;
-              }
-            }
-          });
-
-          if (state) {
-            room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
-          }
-        }
-        if (info.save === true) {
-          room_ended.map((el) => {
-            if (el.roomId === info.roomId) {
-              el.saveCount += 1;
-            }
-          });
-        }
-      } else {
-        room_ended.push({
-          roomId: info.roomId,
-          endCount: info.save ? 0 : 1,
-          saveCount: info.save ? 1 : 0,
-          notSaveCount: info.save ? 0 : 1,
-        });
-      }
-  })
+ 
 
 
 
@@ -904,6 +856,56 @@ io.on("connection", (socket) => {
         });
       });
     });
+
+    socket.on("isSaved",(info)=>{
+      let findEnded = room_ended.find((r) => r.roomId === info.roomId);
+      console.log("isSaved-------",info);
+        if (findEnded) {
+          if (info.save === false) {
+            let state = false;
+            room_ended.map((el) => {
+              if (el.roomId === info.roomId) {
+                el.endCount += 1;
+                el.notSaveCount += 1;
+                if (el.endCount === 2) {
+                  if (info.chat) {
+                    fs.unlink(`uploads/${info.roomId}`, (err) => {
+                      if (err) {
+                      console.error("Error deleting the file:", err);
+                      return;
+                      }
+                    });
+  
+                    state = true;
+                  }
+                }
+  
+                if (el.saveCount + el.notSaveCount === 2) {
+                  state = true;
+                }
+              }
+            });
+  
+            if (state) {
+              room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
+            }
+          }
+          if (info.save === true) {
+            room_ended.map((el) => {
+              if (el.roomId === info.roomId) {
+                el.saveCount += 1;
+              }
+            });
+          }
+        } else {
+          room_ended.push({
+            roomId: info.roomId,
+            endCount: info.save ? 0 : 1,
+            saveCount: info.save ? 1 : 0,
+            notSaveCount: info.save ? 0 : 1,
+          });
+        }
+    })
 
 
     socket.on("onFocus", (data) => {
