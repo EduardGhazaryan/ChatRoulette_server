@@ -92,7 +92,7 @@ const UserController = {
                     if (findUser) {
                         findUser.status = "offline";
                         await findUser.save();
-                        console.log("offline----", findUser);
+                        // console.log("offline----", findUser);
                     } else {
                         console.log("Invalid ID: User Not Found");
                     }

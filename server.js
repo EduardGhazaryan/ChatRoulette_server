@@ -870,11 +870,11 @@ io.on("connection", (socket) => {
           if (el.roomId === info.roomId) {
             if(info.save){
               el.saveCount += 1;
-              el.edndCount += 1;
+              el.endCount += 1;
               return el
             }else{
               el.notSaveCount += 1;
-              el.edndCount += 1;
+              el.endCount += 1;
               return el
             }
           }else{
