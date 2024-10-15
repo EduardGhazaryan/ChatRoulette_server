@@ -857,54 +857,141 @@ io.on("connection", (socket) => {
       });
     });
 
-    socket.on("isSaved",(info)=>{
+    socket.on("isSaved",async (info)=>{
       let findEnded = room_ended.find((r) => r.roomId === info.roomId);
       console.log("isSaved-------",info);
-        if (findEnded) {
-          if (info.save === false) {
-            let state = false;
-            room_ended.map((el) => {
-              if (el.roomId === info.roomId) {
-                el.endCount += 1;
-                el.notSaveCount += 1;
-                if (el.endCount === 2) {
-                  if (info.chat) {
-                    fs.unlink(`uploads/${info.roomId}`, (err) => {
-                      if (err) {
-                      console.error("Error deleting the file:", err);
-                      return;
-                      }
-                    });
-  
-                    state = true;
-                  }
-                }
-  
-                if (el.saveCount + el.notSaveCount === 2) {
-                  state = true;
-                }
-              }
-            });
-  
-            if (state) {
-              room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
+      const user = await User.findById(info.userId);
+
+      // roomId, chat, userId,participantId ,save 
+
+
+      if(findEnded){
+        room_ended.map((el) => {
+          if (el.roomId === info.roomId) {
+            if(info.save){
+              el.saveCount += 1;
+              el.edndCount += 1;
+              return el
+            }else{
+              el.notSaveCount += 1;
+              el.edndCount += 1;
+              return el
             }
+          }else{
+            return el
           }
-          if (info.save === true) {
-            room_ended.map((el) => {
-              if (el.roomId === info.roomId) {
-                el.saveCount += 1;
+        });
+      }else{
+        room_ended.push({
+          roomId: info.roomId,
+          endCount: 1,
+          saveCount: info.save ? 1 : 0,
+          notSaveCount: info.save ? 0 : 1,
+        });
+
+      }
+
+
+      if(info.save){
+
+
+       
+
+
+
+        let messageText = info.language === "am" ? "Նամակագրություն" : info.language === "ru" ? "Переписка" : "Chat";
+			  const createdAt = getCurrentDate();
+			  const newChat = new Chats({
+			      userId : info.userId,
+			      roomId: info.roomId,
+			      participantId : info.participantId,
+			      createdAt,
+			      chatName: `${messageText}/${createdAt}`,
+			      chat: info.chat
+			  });
+	
+			await newChat.save();
+	
+			user.chats = [...user.chats, newChat._id];
+			await user.save();
+
+      let findEnd = room_ended.find((r) => r.roomId === info.roomId);
+
+      if(findEnd.endCount === 2){
+        room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
+      }
+
+      }else{
+        let findEnd = room_ended.find((r) => r.roomId === info.roomId);
+
+        if(findEnd.endCount === 2){
+          if(findEnd.notSaveCount === 2){
+            fs.unlink(`uploads/${info.roomId}`, (err) => {
+              if (err) {
+              console.error("Error deleting the file:", err);
+              return;
               }
             });
           }
-        } else {
-          room_ended.push({
-            roomId: info.roomId,
-            endCount: info.save ? 0 : 1,
-            saveCount: info.save ? 1 : 0,
-            notSaveCount: info.save ? 0 : 1,
-          });
+
+          room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
         }
+
+       
+      }
+
+
+
+
+        // if (findEnded) {
+        //   if (info.save === false) {
+        //     let state = false;
+        //     room_ended.map((el) => {
+        //       if (el.roomId === info.roomId) {
+        //         el.endCount += 1;
+        //         el.notSaveCount += 1;
+        //         if (el.endCount === 2) {
+        //           if (info.chat) {
+        //             fs.unlink(`uploads/${info.roomId}`, (err) => {
+        //               if (err) {
+        //               console.error("Error deleting the file:", err);
+        //               return;
+        //               }
+        //             });
+  
+        //             state = true;
+        //           }
+        //         }
+  
+        //         if (el.saveCount + el.notSaveCount === 2) {
+        //           state = true;
+        //         }
+        //       }
+        //     });
+  
+        //     if (state) {
+        //       room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
+        //     }
+        //   }
+        //   if (info.save === true) {
+        //     room_ended.map((el) => {
+        //       if (el.roomId === info.roomId) {
+        //         el.saveCount += 1;
+        //       }
+        //     });
+        //   }
+        // } else {
+        //   room_ended.push({
+        //     roomId: info.roomId,
+        //     endCount: 1,
+        //     saveCount: info.save ? 1 : 0,
+        //     notSaveCount: info.save ? 0 : 1,
+        //   });
+
+
+
+
+        // }
     })
 
 
