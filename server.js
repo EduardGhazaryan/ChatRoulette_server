@@ -103,7 +103,7 @@ const users = {};
 let room_ended = [];
 let newRoomConnect = [];
 let userCount = [];
-let inetrvalUsers = []
+let intervalUsers = []
 
 const getCurrentDate = () => {
   const today = new Date();
@@ -817,12 +817,12 @@ io.on("connection", (socket) => {
         //   }
         // }, 60000);
 
-      inetrvalUsers.push(
+      intervalUsers.push(
         {
           userId : info.userId, 
           roomId: info.roomId, 
           interval: setTimeout(() => {
-          console.log("interval-----------");
+          console.log("interval-----------work-------");
           }, 10000) 
         }
       )
@@ -873,11 +873,16 @@ io.on("connection", (socket) => {
     socket.on("isSaved",async (info)=>{
       let findEnded = room_ended.find((r) => r.roomId === info.roomId);
       console.log("isSaved-------",info);
-      inetrvalUsers.map((u)=>{
+      intervalUsers.map((u)=>{
         if(u.userId === info.userId && u.roomId === info.roomId){
           clearTimeout(u.interval)
         }
       })
+
+      console.log("intervalUsers---------",intervalUsers);
+      intervalUsers = intervalUsers.filter((u)=> u.userId !== info.userId && u.roomId !== info.roomId)
+      console.log("intervalUsers---------delete------",intervalUsers);
+
       const user = await User.findById(info.userId);
 
 
