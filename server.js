@@ -763,11 +763,11 @@ io.on("connection", (socket) => {
 
       newRoomConnect = newRoomConnect.filter((r) => r.roomId !== info.roomId);
 
-      if(participantID){
+
         socket
         .to(participantID)
         .emit("end_chat", { message: "Zrucakicy lqec chaty" });
-      }
+
 
 
         
