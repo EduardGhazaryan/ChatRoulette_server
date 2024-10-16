@@ -825,7 +825,7 @@ io.on("connection", (socket) => {
           roomId: info.roomId, 
           interval: setTimeout(() => {
           console.log("interval-----------work-------");
-          }, 10000) 
+          }, 20000) 
         }
       )
       
