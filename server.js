@@ -103,6 +103,7 @@ const users = {};
 let room_ended = [];
 let newRoomConnect = [];
 let userCount = [];
+let inetrvalUsers = []
 
 const getCurrentDate = () => {
   const today = new Date();
@@ -412,7 +413,7 @@ io.on("connection", (socket) => {
   if (!users[socket.id]) {
     users[socket.id] = socket.id;
   }
-  let interval = null
+
 
   socket.emit("me", socket.id);
 
@@ -645,6 +646,8 @@ io.on("connection", (socket) => {
       }
     }
 
+
+
     socket.on("message", async (message) => {
       console.log("new-message----", message);
       const now = new Date();
@@ -814,10 +817,16 @@ io.on("connection", (socket) => {
         //   }
         // }, 60000);
 
-
-        interval = setTimeout(() => {
+      inetrvalUsers.push(
+        {
+          userId : info.userId, 
+          roomId: info.roomId, 
+          interval: setTimeout(() => {
           console.log("interval-----------");
-        }, 5000);
+          }, 10000) 
+        }
+      )
+      
       socket.removeAllListeners("message");
       socket.removeAllListeners("image_upload");
       socket.removeAllListeners("sendVoiceMessage");
@@ -864,9 +873,11 @@ io.on("connection", (socket) => {
     socket.on("isSaved",async (info)=>{
       let findEnded = room_ended.find((r) => r.roomId === info.roomId);
       console.log("isSaved-------",info);
-      if(interval !== null){
-        clearTimeout(interval)
-      }
+      inetrvalUsers.map((u)=>{
+        if(u.userId === info.userId && u.roomId === info.roomId){
+          clearTimeout(u.interval)
+        }
+      })
       const user = await User.findById(info.userId);
 
 
