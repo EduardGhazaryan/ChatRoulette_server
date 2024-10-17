@@ -620,6 +620,7 @@ io.on("connection", (socket) => {
       newRoomConnect.push({
         roomId,
         roomMembers: [payload.socketID, payload.participant],
+        endCount : 0
       });
 
       socket.join(roomId);
@@ -742,14 +743,11 @@ io.on("connection", (socket) => {
 
     
     socket.on("end_chat", async (info) => {
-      findRoom = newRoomConnect.find((r) => r.roomId === info.roomId);
+      let findRoom = newRoomConnect?.find((r) => r.roomId === info.roomId);
       let participantID = findRoom?.roomMembers?.find(
         (u) => u !== info.socketID
       );
-      let findEnded = room_ended.find((r) => r.roomId === info.roomId);
-
-   
-
+      
       const findOnlineUser = await OnlineUsers.findOne({ user: info.userId });
 
       if (findOnlineUser) {
@@ -761,12 +759,25 @@ io.on("connection", (socket) => {
         (u) => u.roomId !== info.roomId && u.socketID !== info.socketID
       );
 
-      newRoomConnect = newRoomConnect.filter((r) => r.roomId !== info.roomId);
-
-
+      if(findRoom.endCount === 0){
+        newRoomConnect.map((r)=>{
+          if(r.roomId === info.roomId){
+            r.endCount  = r.endCount + 1
+          }
+        })
         socket
         .to(participantID)
         .emit("end_chat", { message: "Zrucakicy lqec chaty" });
+        console.log("newRoomConnect---------changed--------",newRoomConnect);
+      }
+      if(findRoom.endCount > 0){
+        newRoomConnect = newRoomConnect.filter((r) => r.roomId !== info.roomId);
+      }
+
+      
+
+
+       
 
 
 
