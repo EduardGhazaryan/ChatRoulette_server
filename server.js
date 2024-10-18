@@ -842,7 +842,7 @@ io.on("connection", (socket) => {
           userId : info.userId, 
           roomId: info.roomId, 
           interval: setTimeout(() => {
-          console.log("interval-----------work-------");
+          socket.to(info.socketID).emit("close_time",{message:" Pahne Ekel"})
           }, 20000) 
         }
       )
