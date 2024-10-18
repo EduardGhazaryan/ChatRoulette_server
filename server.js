@@ -595,11 +595,7 @@ io.on("connection", (socket) => {
       roomId = findChat.roomId;
       socket.join(findChat.roomId);
 
-      socket.emit("room_joined", {
-        roomId: findChat.roomId,
-        peerId: socket.id,
-        all_users: newRoomConnect,
-      });
+      
 
       console.log("room_joined----", {
         roomId,
@@ -616,6 +612,12 @@ io.on("connection", (socket) => {
         findOnlineUser.status = "offline";
         await findOnlineUser.save();
       }
+
+      socket.emit("room_joined", {
+        roomId: findChat.roomId,
+        peerId: socket.id,
+        all_users: newRoomConnect,
+      });
     } else {
       newRoomConnect.push({
         roomId,
@@ -748,7 +750,7 @@ io.on("connection", (socket) => {
         (u) => u !== info.socketID
       );
 
-      console.log("end_chat--is worked--------",{roomId: info.roomId, user: info.userId});
+      console.log("end_chat--is worked--------",{roomId: info.roomId, user: info.userId,findRoom,participantID});
       
       const findOnlineUser = await OnlineUsers.findOne({ user: info.userId });
 
@@ -761,7 +763,7 @@ io.on("connection", (socket) => {
         (u) => u.roomId !== info.roomId && u.socketID !== info.socketID
       );
 
-      if(findRoom.endCount && findRoom.endCount === 0){
+      if(findRoom && findRoom.endCount === 0){
         newRoomConnect.map((r)=>{
           if(r.roomId === info.roomId){
             r.endCount  = r.endCount + 1
