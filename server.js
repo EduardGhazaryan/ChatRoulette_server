@@ -750,7 +750,7 @@ io.on("connection", (socket) => {
         (u) => u !== info.socketID
       );
 
-      console.log("end_chat--is worked--------",{roomId: info.roomId, user: info.userId,findRoom,participantID});
+      console.log("end_chat--is worked--------",{roomId: info.roomId, user: info.socketID,findRoom,participantID});
       
       const findOnlineUser = await OnlineUsers.findOne({ user: info.userId });
 
