@@ -747,6 +747,8 @@ io.on("connection", (socket) => {
       let participantID = findRoom?.roomMembers?.find(
         (u) => u !== info.socketID
       );
+
+      console.log("end_chat--is worked--------",{roomId: info.roomId, user: info.userId});
       
       const findOnlineUser = await OnlineUsers.findOne({ user: info.userId });
 
@@ -759,7 +761,7 @@ io.on("connection", (socket) => {
         (u) => u.roomId !== info.roomId && u.socketID !== info.socketID
       );
 
-      if(findRoom.endCount === 0){
+      if(findRoom.endCount && findRoom.endCount === 0){
         newRoomConnect.map((r)=>{
           if(r.roomId === info.roomId){
             r.endCount  = r.endCount + 1
