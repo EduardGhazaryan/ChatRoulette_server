@@ -842,6 +842,7 @@ io.on("connection", (socket) => {
           userId : info.userId, 
           roomId: info.roomId, 
           interval: setTimeout(() => {
+            console.log("will-work-timeout---------", info.socketID);
           socket.to(info.socketID).emit("close_time",{message:" Pahne Ekel"})
           }, 20000) 
         }
@@ -896,6 +897,9 @@ io.on("connection", (socket) => {
       intervalUsers.map((u)=>{
         if(u.userId === info.userId && u.roomId === info.roomId){
           clearTimeout(u.interval)
+          return u
+        }else{
+          return u
         }
       })
 
