@@ -767,6 +767,9 @@ io.on("connection", (socket) => {
         newRoomConnect.map((r)=>{
           if(r.roomId === info.roomId){
             r.endCount  = r.endCount + 1
+            return r
+          }else{
+            return r
           }
         })
         socket
