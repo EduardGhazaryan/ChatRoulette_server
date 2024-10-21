@@ -771,7 +771,7 @@ io.on("connection", (socket) => {
           return r
         }
       })
-      if(findRoom && findRoom.endCount === 0){
+      if(findRoom && findRoom.endCount === 1){
         
         socket
         .to(participantID)
