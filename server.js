@@ -764,22 +764,22 @@ io.on("connection", (socket) => {
       );
 
       if(findRoom && findRoom.endCount === 0){
-        newRoomConnect.map((r)=>{
-          if(r.roomId === info.roomId){
-            r.endCount  = r.endCount + 1
-            return r
-          }else{
-            return r
-          }
-        })
+        // newRoomConnect.map((r)=>{
+        //   if(r.roomId === info.roomId){
+        //     r.endCount  = r.endCount + 1
+        //     return r
+        //   }else{
+        //     return r
+        //   }
+        // })
         socket
         .to(participantID)
         .emit("end_chat", { message: "Zrucakicy lqec chaty" });
         console.log("newRoomConnect---------changed--------",newRoomConnect);
       }
-      if(findRoom.endCount > 0){
-        newRoomConnect = newRoomConnect.filter((r) => r.roomId !== info.roomId);
-      }
+      // if(findRoom.endCount > 0){
+      //   newRoomConnect = newRoomConnect.filter((r) => r.roomId !== info.roomId);
+      // }
 
       
 
