@@ -103,7 +103,7 @@ const users = {};
 let room_ended = [];
 let newRoomConnect = [];
 let userCount = [];
-let intervalUsers = []
+
 
 const getCurrentDate = () => {
   const today = new Date();
@@ -414,7 +414,7 @@ io.on("connection", (socket) => {
     users[socket.id] = socket.id;
   }
 
-
+  let intervalUsers = []
   socket.emit("me", socket.id);
 
   socket.on("callUser", (data) => {
