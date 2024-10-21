@@ -906,7 +906,7 @@ io.on("connection", (socket) => {
       })
 
       console.log("intervalUsers---------",intervalUsers);
-      intervalUsers = intervalUsers.filter((u)=> u.userId !== info.userId && u.roomId !== info.roomId)
+      intervalUsers = intervalUsers.filter((u)=> u.userId !== info.userId )
       console.log("intervalUsers---------delete------",intervalUsers);
 
       const user = await User.findById(info.userId);
