@@ -763,25 +763,25 @@ io.on("connection", (socket) => {
       userCount = userCount.filter(
         (u) => u.roomId !== info.roomId && u.socketID !== info.socketID
       );
-
+      newRoomConnect.map((r)=>{
+        if(r.roomId === info.roomId){
+          r.endCount  = r.endCount + 1
+          return r
+        }else{
+          return r
+        }
+      })
       if(findRoom && findRoom.endCount === 0){
-        newRoomConnect.map((r)=>{
-          if(r.roomId === info.roomId){
-            r.endCount  = r.endCount + 1
-            return r
-          }else{
-            return r
-          }
-        })
+        
         socket
         .to(participantID)
         .emit("end_chat", { message: "Zrucakicy lqec chaty" });
         console.log("newRoomConnect---------changed--------",newRoomConnect);
       }
-      console.log("my---log------", findRoom);
-      // if(findRoom.endCount > 0){
-      //   newRoomConnect = newRoomConnect.filter((r) => r.roomId !== info.roomId);
-      // }
+     
+      if(findRoom.endCount > 1){
+        newRoomConnect = newRoomConnect.filter((r) => r.roomId !== info.roomId);
+      }
 
       
 
