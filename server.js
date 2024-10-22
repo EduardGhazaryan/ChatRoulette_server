@@ -552,6 +552,25 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", async ()=>{
     console.log("socket was disconnected--------",socket.id);
+    const findNewRoomConnect =  newRoomConnect.find((r)=> r.roomMembers.includes(socket.id))
+    const findRoomeEnded = room_ended.find((r)=> r.roomId === findNewRoomConnect.roomId)
+
+    if(findRoomeEnded){
+      room_ended.map((room)=>{
+        if(room.roomId === findNewRoomConnect.roomId){
+          room.endCount = room.endCount + 1
+          room.notSaveCount = room.notSaveCount + 1
+          return room
+        }else{
+          return room
+        }
+      })
+
+      console.log("disconnect---------------",findRoomeEnded);
+    }
+
+
+
   })
 
   
@@ -602,6 +621,13 @@ io.on("connection", (socket) => {
         roomId,
         roomMembers: [payload.socketID, payload.participant],
         endCount : 0
+      });
+
+      room_ended.push({
+        roomId: roomId,
+        endCount: 0,
+        saveCount: 0,
+        notSaveCount: 0,
       });
 
       socket.join(roomId);
