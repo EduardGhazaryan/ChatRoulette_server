@@ -559,8 +559,10 @@ io.on("connection", (socket) => {
     const findUser = await OnlineUsers.findOne({socketID: socket.id})
     const findParticipant = await OnlineUsers.findOne({socketID: participantID})
 
-    findUser?.status = "offline"
-    findParticipant?.status = "offline"
+    if(findUser && findParticipant){
+      findUser.status = "offline"
+      findParticipant.status = "offline"
+    }
 
     await Promise.all([findUser.save(), findParticipant.save()])
 
