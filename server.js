@@ -802,7 +802,7 @@ io.on("connection", (socket) => {
           roomId: info.roomId, 
           interval: setTimeout(() => {
             console.log("will-work-timeout---------", info.socketID);
-            io.to(info.socketID).emit("closetime",{message:" Pahne Ekel"})
+            socket.to(info.socketID).emit("closetime",{message:" Pahne Ekel"})
             
           }, 20000) 
         }
