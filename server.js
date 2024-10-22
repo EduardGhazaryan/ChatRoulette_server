@@ -508,7 +508,7 @@ io.on("connection", (socket) => {
       console.log("disconnect--------notfound findEnded------", {room_ended,newRoomConnect});
 	  }
 
-    if (state) {
+
 		 
 
 
@@ -533,7 +533,7 @@ io.on("connection", (socket) => {
 
 
 
-		}
+
 
 
 
