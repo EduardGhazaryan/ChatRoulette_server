@@ -553,7 +553,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect", async ()=>{
     console.log("socket was disconnected--------",socket.id);
     const findNewRoomConnect =  newRoomConnect?.find((r)=> r.roomMembers.includes(socket.id))
-    const findRoomeEnded = room_ended?.find((r)=> r.roomId === findNewRoomConnect.roomId)
+    const findRoomeEnded = room_ended?.find((r)=> r.roomId === findNewRoomConnect?.roomId)
     const participantID = findNewRoomConnect?.roomMembers?.find((u)=> u !== socket.id)
     userCount = userCount.filter((u) => u.socketID !== socket.id);
     const findUser = await OnlineUsers.findOne({socketID: socket.id})
@@ -567,6 +567,7 @@ io.on("connection", (socket) => {
     await Promise.all([findUser.save(), findParticipant.save()])
 
     if(findRoomeEnded){
+      console.log("true----------",findRoomeEnded,findNewRoomConnect);
       room_ended.map((room)=>{
         if(room.roomId === findNewRoomConnect.roomId){
           room.endCount = room.endCount + 1
@@ -577,7 +578,7 @@ io.on("connection", (socket) => {
         }
       })
       newRoomConnect.map((r)=>{
-        if(r.roomId === info.roomId){
+        if(r.roomId === findNewRoomConnect.roomId){
           r.endCount  = r.endCount + 1
           return r
         }else{
@@ -586,6 +587,7 @@ io.on("connection", (socket) => {
       })
 
       if(findRoomeEnded.endCount === 2){
+        console.log("endcount ===== 2--------------",findRoomeEnded);
         if(findRoomeEnded.notSaveCount === 2){
           		fs.unlink(`uploads/${findRoom.roomId}`, (err) => {
 				        if (err) {
@@ -601,6 +603,7 @@ io.on("connection", (socket) => {
       }
 
       if(findRoomeEnded.endCount === 1){
+        console.log("will--work--emit----=-----", findRoomeEnded);
         socket.to(participantID).emit("end_chat", {message:"Zrucakicy lqec chaty"})
       }
     }
