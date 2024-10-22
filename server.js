@@ -439,6 +439,9 @@ io.on("connection", (socket) => {
 	  const participant = findRoom?.roomMembers?.find(r=> r !== socket.id)
 	  let findEnded = room_ended.find((r) => r.roomId === findRoom.roomId);
 
+
+    console.log("diconnect----1-------",{room: findRoom, participant, findEnded, socketID: socket.id});
+
     let state = false;
   
 	  const findParticipant = await OnlineUsers.findOne({ socketID: participant });
@@ -484,6 +487,7 @@ io.on("connection", (socket) => {
       }
     })
 
+    console.log("disconnect----------find findEnded------",{room_ended,newRoomConnect});
 	
 	  }else{
 		room_ended.push({
@@ -492,6 +496,16 @@ io.on("connection", (socket) => {
 			saveCount:  0,
 			notSaveCount:  1,
 		  });
+      newRoomConnect.map((r)=>{
+        if(r.roomId === findRoom.roomId){
+          r.endCount  = r.endCount + 1
+          return r
+        }else{
+          return r
+        }
+      })
+
+      console.log("disconnect--------notfound findEnded------", {room_ended,newRoomConnect});
 	  }
 
     if (state) {
