@@ -429,8 +429,11 @@ io.on("connection", (socket) => {
 
 
   socket.on("disconnect", async () => {
-    delete users[socket.id];
 
+    console.log("disconnect---is -----worked-----",socket.id);
+
+    delete users[socket.id];
+    
     const findOnlineUser = await OnlineUsers.findOne({ socketID: socket.id });
 
 	  userCount = userCount.filter((u) => u.socketID !== socket.id);
