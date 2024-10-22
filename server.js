@@ -513,14 +513,14 @@ io.on("connection", (socket) => {
 
 
 
-      if(findRoom && findRoom.endCount === 1){
+      if(findEnded && findEnded.endCount === 1){
         
         socket.to(participant).emit("end_chat", { message: "Zrucakicy lqec chaty" });
         console.log("disconnect----emit---is---worked-----");
        
       }
      
-      if(findRoom.endCount > 1){
+      if(findEnded.endCount > 1){
         room_ended = room_ended.filter((r) => r.roomId !== findRoom.roomId);
 		  newRoomConnect = newRoomConnect.filter(
 			(r) => !r.roomMembers.includes(socket.id)
