@@ -428,108 +428,108 @@ io.on("connection", (socket) => {
 
 
 
-  socket.on("disconnect", async () => {
+  // socket.on("disconnect", async () => {
 
-    console.log("disconnect---is -----worked-----",socket.id);
+  //   console.log("disconnect---is -----worked-----",socket.id);
 
-    delete users[socket.id];
+  //   delete users[socket.id];
     
-    const findOnlineUser = await OnlineUsers.findOne({ socketID: socket.id });
+  //   const findOnlineUser = await OnlineUsers.findOne({ socketID: socket.id });
 
-	  userCount = userCount.filter((u) => u.socketID !== socket.id);
+	//   userCount = userCount.filter((u) => u.socketID !== socket.id);
 
-	  const findRoom = newRoomConnect.find(r=> r.roomMembers.includes(socket.id))
-	  const participant = findRoom?.roomMembers?.find(r=> r !== socket.id)
-	  let findEnded = room_ended.find((r) => r.roomId === findRoom.roomId);
+	//   const findRoom = newRoomConnect.find(r=> r.roomMembers.includes(socket.id))
+	//   const participant = findRoom?.roomMembers?.find(r=> r !== socket.id)
+	//   let findEnded = room_ended.find((r) => r.roomId === findRoom.roomId);
 
 
-    console.log("diconnect----1-------",{room: findRoom, participant, findEnded, socketID: socket.id});
+  //   console.log("diconnect----1-------",{room: findRoom, participant, findEnded, socketID: socket.id});
 
-    let state = false;
+  //   let state = false;
   
-	  const findParticipant = await OnlineUsers.findOne({ socketID: participant });
+	//   const findParticipant = await OnlineUsers.findOne({ socketID: participant });
   
-      if (findOnlineUser) {
-        findOnlineUser.status = "offline";
-	     findParticipant.status = "offline";
-        await Promise.all([findOnlineUser.save(), findParticipant.save()]);
-      }
+  //     if (findOnlineUser) {
+  //       findOnlineUser.status = "offline";
+	//      findParticipant.status = "offline";
+  //       await Promise.all([findOnlineUser.save(), findParticipant.save()]);
+  //     }
 
 
 
 
-	if (findEnded) {
+	// if (findEnded) {
 	
-		room_ended.map((el) => {
-		  if (el.roomId === findRoom.roomId) {
-			el.endCount += 1;
-			el.notSaveCount += 1;
-			if (el.endCount === 2 && el.notSaveCount === 2) {
-			  fs.unlink(`uploads/${findRoom.roomId}`, (err) => {
-				  if (err) {
-					console.error("Error deleting the file:", err);
-					return;
-				  }
-				});
+	// 	room_ended.map((el) => {
+	// 	  if (el.roomId === findRoom.roomId) {
+	// 		el.endCount += 1;
+	// 		el.notSaveCount += 1;
+	// 		if (el.endCount === 2 && el.notSaveCount === 2) {
+	// 		  fs.unlink(`uploads/${findRoom.roomId}`, (err) => {
+	// 			  if (err) {
+	// 				console.error("Error deleting the file:", err);
+	// 				return;
+	// 			  }
+	// 			});
 
-				state = true;
-			}
+	// 			state = true;
+	// 		}
 
-			if (el.endCount === 2) {
-			  state = true;
-			}
-		  }
-		});
+	// 		if (el.endCount === 2) {
+	// 		  state = true;
+	// 		}
+	// 	  }
+	// 	});
 
-    newRoomConnect.map((r)=>{
-      if(r.roomId === findRoom.roomId){
-        r.endCount  = r.endCount + 1
-        return r
-      }else{
-        return r
-      }
-    })
+  //   newRoomConnect.map((r)=>{
+  //     if(r.roomId === findRoom.roomId){
+  //       r.endCount  = r.endCount + 1
+  //       return r
+  //     }else{
+  //       return r
+  //     }
+  //   })
 
-    console.log("disconnect----------find findEnded------",{room_ended,newRoomConnect});
+  //   console.log("disconnect----------find findEnded------",{room_ended,newRoomConnect});
 	
-	  }else{
-		room_ended.push({
-			roomId: findRoom.roomId,
-			endCount:  1,
-			saveCount:  0,
-			notSaveCount:  1,
-		  });
-      newRoomConnect.map((r)=>{
-        if(r.roomId === findRoom.roomId){
-          r.endCount  = r.endCount + 1
-          return r
-        }else{
-          return r
-        }
-      })
+	//   }else{
+	// 	room_ended.push({
+	// 		roomId: findRoom.roomId,
+	// 		endCount:  1,
+	// 		saveCount:  0,
+	// 		notSaveCount:  1,
+	// 	  });
+  //     newRoomConnect.map((r)=>{
+  //       if(r.roomId === findRoom.roomId){
+  //         r.endCount  = r.endCount + 1
+  //         return r
+  //       }else{
+  //         return r
+  //       }
+  //     })
 
-      console.log("disconnect--------notfound findEnded------", {room_ended,newRoomConnect});
-	  }
+  //     console.log("disconnect--------notfound findEnded------", {room_ended,newRoomConnect});
+	//   }
 
 
 		 
 
 
 
-      if(findEnded && findEnded.endCount === 1){
+  //     if(findEnded && findEnded.endCount === 1){
         
-        socket.to(participant).emit("end_chat", { message: "Zrucakicy lqec chaty" });
-        console.log("disconnect----emit---is---worked-----");
+  //       socket.to(participant).emit("end_chat", { message: "Zrucakicy lqec chaty" });
+  //       console.log("disconnect----emit---is---worked-----");
        
-      }
+  //     }
      
-      if(findEnded.endCount > 1){
-        room_ended = room_ended.filter((r) => r.roomId !== findRoom.roomId);
-		  newRoomConnect = newRoomConnect.filter(
-			(r) => !r.roomMembers.includes(socket.id)
-		  );
-      console.log("disconnect----emit---not---worked-----", "rooms-----was------deleted");
-      }
+  //     if(findEnded.endCount > 1){
+  //       room_ended = room_ended.filter((r) => r.roomId !== findRoom.roomId);
+	// 	  newRoomConnect = newRoomConnect.filter(
+	// 		(r) => !r.roomMembers.includes(socket.id)
+	// 	  );
+  //     console.log("disconnect----emit---not---worked-----", "rooms-----was------deleted");
+  //     }
 
 
 
@@ -543,9 +543,16 @@ io.on("connection", (socket) => {
 
    
 
-    console.log("disconnect-------", socket.id);
-  });
+  //   console.log("disconnect-------", socket.id);
+  // });
 
+
+
+
+
+  socket.on("disconnect", async ()=>{
+    console.log("socket was disconnected--------",socket.id);
+  })
 
   
 
