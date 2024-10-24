@@ -10,6 +10,7 @@ const getCurrentDateTime = () => {
 
 
     const formattedTime = currentTime.toISO();
+    console.log("formatedDate--------",formattedTime);
     return formattedTime
 };
 
