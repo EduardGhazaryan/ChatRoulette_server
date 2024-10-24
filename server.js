@@ -138,7 +138,13 @@ app.post("/api/save-token", async (req, res) => {
 
 
 
+const serviceAccount = require("./chatandroid-f0d79-firebase-adminsdk-6y56u-2ec65e2101.json");
+const Chats = require("./Model/Chats.js");
 
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 const sendPushNotification = async (user) => {
   const token = user.firebaseToken;
@@ -179,11 +185,17 @@ const sendPushNotification = async (user) => {
     console.log("Successfully sent message:", response);
   } catch (error) {
     console.error("Error sending message:", error);
-    
-    if (error.errorInfo.code === 'messaging/registration-token-not-registered') {
-      // Remove the invalid token from the user record
+
+    // Check for the specific error regarding invalid registration tokens
+    if (error.errorInfo && error.errorInfo.code === 'messaging/registration-token-not-registered') {
       console.log(`Removing invalid token for user ${user._id}`);
-      await User.updateOne({ _id: user._id }, { $unset: { firebaseToken: 1 } });
+      try {
+        // Remove or invalidate the token in the database
+        await User.updateOne({ _id: user._id }, { $unset: { firebaseToken: 1 } });
+        console.log(`Token removed for user ${user._id}`);
+      } catch (dbError) {
+        console.error(`Error updating database for user ${user._id}:`, dbError);
+      }
     }
   }
 };
@@ -213,8 +225,6 @@ cron.schedule("*/10 * * * * *", async () => {
 
 
 
-// const serviceAccount = require("./chatandroid-f0d79-firebase-adminsdk-6y56u-2ec65e2101.json");
-// const Chats = require("./Model/Chats.js");
 
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount),
