@@ -136,207 +136,31 @@ app.post("/api/save-token", async (req, res) => {
   }
 });
 
-// app.post("/api/user/addChat", async (req, res) => {
-//   try {
-//     const { roomId, chat, userId,participantId ,save } = req.body;
-//     const language = req.headers["accept-language"];
-
-//     if ((roomId, chat, userId)) {
-//       const user = await User.findById(userId);
-//       if (user) {
-       
-//           findRoom = newRoomConnect.find((r) => r.roomId === roomId);
-//         //   let participantID = findRoom?.roomMembers?.find(
-//         //     (u) => u !== user.socketID
-//         //   );
-//           let findEnded = room_ended.find((r) => r.roomId === roomId);
-
-//           if (findEnded) {
-//             if (save === false) {
-//               let state = false;
-//               room_ended.map((el) => {
-//                 if (el.roomId === roomId) {
-//                   el.endCount += 1;
-//                   el.notSaveCount += 1;
-//                   if (el.endCount === 2) {
-//                     // if (chat) {
-//                     // //   chat.map((el) => {
-//                     // //     if (el.imageUrl) {
-//                     // //       fs.unlink(`${el.imageUrl}`, (err) => {
-//                     // //         if (err) {
-//                     // //           console.error("Error deleting the file:", err);
-//                     // //           return;
-//                     // //         }
-//                     // //       });
-//                     // //     }
-//                     // //     if (el.voiceUrl) {
-//                     // //       fs.unlink(`${el.voiceUrl}`, (err) => {
-//                     // //         if (err) {
-//                     // //           console.error("Error deleting the file:", err);
-//                     // //           return;
-//                     // //         }
-//                     // //       });
-//                     // //     }
-//                     // //   });
-
-					
-//                     // }
-
-// 					fs.unlink(`uploads/${roomId}`, (err) => {
-// 						if (err) {
-// 						  console.error("Error deleting the file:", err);
-// 						  return;
-// 						}
-// 					  });
-
-//                       state = true;
-//                   }
-
-//                   if (el.saveCount + el.notSaveCount === 2) {
-//                     state = true;
-//                   }
-//                 }
-//               });
-
-//               if (state) {
-//                 room_ended = room_ended.filter((r) => r.roomId !== roomId);
-//               }
-//             }
-//             if (save === true) {
-//               room_ended.map((el) => {
-//                 if (el.roomId === roomId) {
-//                   el.saveCount += 1;
-//                 }
-//               });
-
-
-// 			  let messageText = language === "am" ? "Նամակագրություն" : language === "ru" ? "Переписка" : "Chat";
-// 			  const createdAt = getCurrentDate();
-// 			const newChat = new Chats({
-// 			  userId,
-// 			  roomId,
-// 			  participantId : participantId,
-// 			  createdAt,
-// 			  chatName: `${messageText}/${createdAt}`,
-// 			  chat,
-// 			});
-	
-// 			await newChat.save();
-	
-// 			user.chats = [...user.chats, newChat._id];
-// 			await user.save();
 
 
 
 
-
-
-//             }
-//           } else {
-//             room_ended.push({
-//               roomId: roomId,
-//               endCount: save === true ? 0 : 1,
-//               saveCount: save === true ? 1 : 0,
-//               notSaveCount: save === true ? 0 : 1,
-//             });
-
-
-// 			if (save === true) {
-// 				room_ended.map((el) => {
-// 				  if (el.roomId === roomId) {
-// 					el.saveCount += 1;
-// 				  }
-// 				});
+const sendPushNotification = async (user) => {
+  const token = user.firebaseToken;
   
-  
-// 				let messageText = language === "am" ? "Նամակագրություն" : language === "ru" ? "Переписка" : "Chat";
-// 				const createdAt = getCurrentDate();
-// 			  const newChat = new Chats({
-// 				userId,
-// 				roomId,
-// 				participantId : participantId,
-// 				createdAt,
-// 				chatName: `${messageText}/${createdAt}`,
-// 				chat,
-// 			  });
-	  
-// 			  await newChat.save();
-	  
-// 			  user.chats = [...user.chats, newChat._id];
-// 			  await user.save();
-  
-  
-  
-  
-  
-  
-// 			  }
+  if (!token) {
+    console.log(`User ${user._id} does not have a firebase token`);
+    return;
+  }
 
+  console.log("Sending notification to:", token);
 
-//           }
-       
-
-   
-        
-
-//         res.status(201).send({ message: "Chat was added", success: true });
-//       } else {
-//         if (language) {
-//           if (language === "am") {
-//             res
-//               .status(200)
-//               .send({ message: "Օգտատերը չի գտնվել", success: false });
-//             // return {status: 200, message: "Օգտատերը չի գտնվել", success:false}
-//           }
-//           if (language === "ru") {
-//             res
-//               .status(200)
-//               .send({ message: "Пользователь не найден", success: false });
-//             // return {status: 200, message: "Пользователь не найден", success:false}
-//           }
-//           if (language === "en") {
-//             res.status(200).send({ message: "User Not Found", success: false });
-
-//             // return {status: 200, message: "User Not Found", success:false}
-//           }
-//         } else {
-//           res.status(200).send({ message: "User Not Found", success: false });
-
-//           // return {status: 200, message: "User Not Found", success:false}
-//         }
-//       }
-//     } else {
-//       res.status(400).send({ message: "Bad Request" });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send({ message: "Internal Server Error" });
-//   }
-// });
-
-const serviceAccount = require("./chatandroid-f0d79-firebase-adminsdk-6y56u-2ec65e2101.json");
-const Chats = require("./Model/Chats.js");
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
-
-const sendPushNotification = (token) => {
-
-console.log("notif----log-----",token);
   const message = {
     notification: {
       title: "Special Offer",
       body: "Try your Luck",
     },
     token: token,
-    data: {
-      
-    },
+    data: {},
     apns: {
       headers: {
-        'apns-priority': '10', 
-        'apns-push-type': 'alert' 
+        'apns-priority': '10',
+        'apns-push-type': 'alert'
       },
       payload: {
         aps: {
@@ -347,34 +171,109 @@ console.log("notif----log-----",token);
           sound: 'default'
         }
       }
-    },    
-  
+    },
   };
 
-  admin
-    .messaging()
-    .send(message)
-    .then((response) => {
-      console.log("Successfully sent message:", response);
-    })
-    .catch((error) => {
-      console.log("Error sending message:", error);
-    });
+  try {
+    const response = await admin.messaging().send(message);
+    console.log("Successfully sent message:", response);
+  } catch (error) {
+    console.error("Error sending message:", error);
+    
+    if (error.errorInfo.code === 'messaging/registration-token-not-registered') {
+      // Remove the invalid token from the user record
+      console.log(`Removing invalid token for user ${user._id}`);
+      await User.updateOne({ _id: user._id }, { $unset: { firebaseToken: 1 } });
+    }
+  }
 };
 
 cron.schedule("*/10 * * * * *", async () => {
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-  const inactiveUsers = await User.find({
-    lastLogin: { $lt: twentyFourHoursAgo },
-  });
+  try {
+    const inactiveUsers = await User.find({
+      lastLogin: { $lt: twentyFourHoursAgo },
+    });
 
-  const all_users = await User.find()
+    inactiveUsers.forEach((user) => {
+      sendPushNotification(user);
+    });
 
-  all_users.forEach((user) => {
-    sendPushNotification(user.firebaseToken);
-  });
+  } catch (error) {
+    console.error("Error fetching users:", error);
+  }
 });
+
+
+
+
+
+
+
+
+
+// const serviceAccount = require("./chatandroid-f0d79-firebase-adminsdk-6y56u-2ec65e2101.json");
+// const Chats = require("./Model/Chats.js");
+
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+// });
+
+// const sendPushNotification = (token) => {
+
+// console.log("notif----log-----",token);
+//   const message = {
+//     notification: {
+//       title: "Special Offer",
+//       body: "Try your Luck",
+//     },
+//     token: token,
+//     data: {
+      
+//     },
+//     apns: {
+//       headers: {
+//         'apns-priority': '10', 
+//         'apns-push-type': 'alert' 
+//       },
+//       payload: {
+//         aps: {
+//           alert: {
+//             title: "Special Offer",
+//             body: "Try your Luck",
+//           },
+//           sound: 'default'
+//         }
+//       }
+//     },    
+  
+//   };
+
+//   admin
+//     .messaging()
+//     .send(message)
+//     .then((response) => {
+//       console.log("Successfully sent message:", response);
+//     })
+//     .catch((error) => {
+//       console.log("Error sending message:", error);
+//     });
+// };
+
+// cron.schedule("*/10 * * * * *", async () => {
+//   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+//   const inactiveUsers = await User.find({
+//     lastLogin: { $lt: twentyFourHoursAgo },
+//   });
+
+//   const all_users = await User.find()
+
+//   all_users.forEach((user) => {
+//     sendPushNotification(user.firebaseToken);
+//   });
+// });
 
 //-----------------------Firebase end----------------
 
