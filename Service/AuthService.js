@@ -1,16 +1,16 @@
 const User = require('../Model/User.js');
 const { generateAccessToken } = require('../Utils/GenerateToken.js');
-const { DateTime } = require('luxon');
+const moment = require('moment-timezone');
 
 
 
 
 const getCurrentDateTime = () => {
-    const currentTimeInArmenia = DateTime.now().setZone('Asia/Yerevan');
 
-    const formattedTime = currentTimeInArmenia.toUTC().toISO({ suppressMilliseconds: false, format: 'extended' });
-    console.log("formatedDate--------",formattedTime);
-    return formattedTime
+    const currentDateTime = moment().tz(moment.tz.guess()).format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+
+    console.log("my-time--------",currentDateTime);
+    return currentDateTime
 };
 
 
