@@ -6,9 +6,9 @@ const moment = require('moment-timezone');
 
 
 const getCurrentDateTime = () => {
-    const timezone = 'Asia/Yerevan';
+    const localDateTime = moment.tz('Asia/Yerevan');
 
-    const currentDateTime = moment.tz(timezone).format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+    const currentDateTime = localDateTime.utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
     console.log("my-time--------",currentDateTime);
     return currentDateTime
