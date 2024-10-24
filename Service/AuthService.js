@@ -1,6 +1,14 @@
 const User = require('../Model/User.js');
 const { generateAccessToken } = require('../Utils/GenerateToken.js');
 
+
+const getCurrentDateTime = () => {
+    const now = new Date();
+    return now.toISOString();
+};
+
+
+
 const AuthService = {
     signUp: async (gender, age, nickname,socketID,phoneID,language) => {
        
@@ -35,7 +43,7 @@ const AuthService = {
                 }
           
                 const access_token = generateAccessToken(userObj);
-                const loginTime = new Date();
+                const loginTime = getCurrentDateTime();
                 const newUser = new User({
                     age,
                     gender,
@@ -79,7 +87,7 @@ const AuthService = {
             if(findUser){
                 if(findUser.phoneID === phoneID){
                    
-                        const loginTime = new Date();
+                        const loginTime = getCurrentDateTime();
                         findUser.status = "online"
                         findUser.socketID = socketID
                         findUser.lastLogin = loginTime
@@ -148,7 +156,7 @@ const AuthService = {
             const findUser = await User.findOne({access_token :token})
 
             if(findUser){
-                const loginTime = new Date();
+                const loginTime = getCurrentDateTime();
                 findUser.status = "online"
                 findUser.socketID = socketID
                 findUser.lastLogin = loginTime
