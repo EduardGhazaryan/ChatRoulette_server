@@ -207,7 +207,8 @@ cron.schedule("*/10 * * * * *", async () => {
       lastLogin: { $lt: twentyFourHoursAgo },
     });
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  console.log("last---login------",twentyFourHoursAgo);
+    console.log("last---login--------",twentyFourHoursAgo);
+    console.log("crone-------------",inactiveUsers);
 
     // inactiveUsers.forEach((user) => {
     //   sendPushNotification(user);
