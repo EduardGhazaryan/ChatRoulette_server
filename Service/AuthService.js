@@ -1,16 +1,22 @@
 const User = require('../Model/User.js');
 const { generateAccessToken } = require('../Utils/GenerateToken.js');
+const { DateTime } = require('luxon');
+
+
 
 
 const getCurrentDateTime = () => {
-    const now = new Date();
-    return now.toISOString();
+    const currentTime = DateTime.now().setZone('Asia/Yerevan');
+
+
+    const formattedTime = currentTime.toISO();
+    return formattedTime
 };
 
 
 
 const AuthService = {
-    signUp: async (gender, age, nickname,socketID,phoneID,language) => {
+    signUp: async (gender, age, nickname,socketID,phoneID,language,timezone) => {
        
         if (gender && age && nickname) {
             const findUser = await User.findOne({ nickname });
@@ -80,7 +86,7 @@ const AuthService = {
             return { status: 400, message: "Bad Request" };
         }
     },
-    signIn : async (nickname,socketID,phoneID,language)=>{
+    signIn : async (nickname,socketID,phoneID,language,timezone)=>{
         if(nickname && socketID, phoneID){
             let findUser = await User.findOne({nickname})
 
@@ -151,7 +157,7 @@ const AuthService = {
             return {status:400, message :"Bad Request"}
         }
     },
-    signInToken : async (token,socketID,language)=>{
+    signInToken : async (token,socketID,language,timezone)=>{
         if(token){
             const findUser = await User.findOne({access_token :token})
 

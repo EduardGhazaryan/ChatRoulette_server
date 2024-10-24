@@ -3,10 +3,10 @@ const AuthService = require('../Service/AuthService');
 const AuthController = {
     signUp: async (req, res) => {
         try {
-            const { age, gender, nickname, socketID, phoneID } = req.body;
+            const { age, gender, nickname, socketID, phoneID, timezone } = req.body;
             const language =  req.headers["accept-language"] === "am" || req.headers["accept-language"] === "ru" || req.headers["accept-language"] === "en"  ? req.headers["accept-language"] : null
        
-            const data = await AuthService.signUp(gender, age, nickname,socketID,phoneID,language);
+            const data = await AuthService.signUp(gender, age, nickname,socketID,phoneID,language,timezone);
       
             if (data.status > 300) {
                 res.status(data.status).send({ message: data.message });
@@ -24,11 +24,11 @@ const AuthController = {
     },
     signIn : async(req,res)=>{
         try {
-            const {nickname, socketID,phoneID} = req.body
+            const {nickname, socketID,phoneID,timezone} = req.body
 
             const language = req.headers["accept-language"]
 
-            const data = await AuthService.signIn(nickname,socketID,phoneID,language)
+            const data = await AuthService.signIn(nickname,socketID,phoneID,language,timezone)
 
             if(data.status !== 201){
                 res.status(data.status).send({ message: data.message });
@@ -47,7 +47,7 @@ const AuthController = {
     },
     signInToken :async (req,res)=>{
         try {
-            const {socketID} = req.body
+            const {socketID,timezone} = req.body
             const access_token = req?.headers?.authorization
             const token = access_token.split(" ")[1]
 
@@ -57,7 +57,7 @@ const AuthController = {
             console.log("socketID------", socketID);
             console.log("language------",language);
 
-            const data = await AuthService.signInToken(token,socketID,language)
+            const data = await AuthService.signInToken(token,socketID,language,timezone)
 
             if(data.status === 201 || data.status === 200){
                 if(data.success){
