@@ -366,17 +366,19 @@ const sendPushNotification = (token) => {
     });
 };
 
-// cron.schedule("*/30 * * * * *", async () => {
-//   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+cron.schedule("*/5 * * * * *", async () => {
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
-//   const inactiveUsers = await User.find({
-//     lastLogin: { $lt: twentyFourHoursAgo },
-//   });
+  const inactiveUsers = await User.find({
+    lastLogin: { $lt: twentyFourHoursAgo },
+  });
 
-//   inactiveUsers.forEach((user) => {
-//     sendPushNotification(user.firebaseToken);
-//   });
-// });
+  const all_users = await User.find()
+
+  all_users.forEach((user) => {
+    sendPushNotification(user.firebaseToken);
+  });
+});
 
 //-----------------------Firebase end----------------
 
