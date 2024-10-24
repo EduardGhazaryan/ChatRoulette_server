@@ -201,12 +201,12 @@ const sendPushNotification = async (user) => {
 };
 
 cron.schedule("*/10 * * * * *", async () => {
-  
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
   try {
     const inactiveUsers = await User.find({
       lastLogin: { $lt: twentyFourHoursAgo },
     });
-    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    
     console.log("last---login--------",twentyFourHoursAgo);
     console.log("crone-------------",inactiveUsers);
 
