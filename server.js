@@ -314,7 +314,7 @@ app.post("/api/save-token", async (req, res) => {
 //   }
 // });
 
-const serviceAccount = require("./chatandroid-f0d79-firebase-adminsdk-6y56u-66de292809.json");
+const serviceAccount = require("./chatandroid-f0d79-firebase-adminsdk-6y56u-ea5a8778b2.json");
 const Chats = require("./Model/Chats.js");
 
 admin.initializeApp({
@@ -322,13 +322,38 @@ admin.initializeApp({
 });
 
 const sendPushNotification = (token) => {
+
+
   const message = {
     notification: {
       title: "Special Offer",
       body: "Try your Luck",
     },
     token: token,
+    data: {
+      
+    },
+    apns: {
+      headers: {
+        'apns-priority': '10', 
+        'apns-push-type': 'alert' 
+      },
+      payload: {
+        aps: {
+          alert: {
+            title: "Special Offer",
+            body: "Try your Luck",
+          },
+          sound: 'default'
+        }
+      }
+    },    
+  
   };
+
+
+
+  
 
   admin
     .messaging()
