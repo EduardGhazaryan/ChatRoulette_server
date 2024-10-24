@@ -323,7 +323,7 @@ admin.initializeApp({
 
 const sendPushNotification = (token) => {
 
-
+console.log("notif----log-----",token);
   const message = {
     notification: {
       title: "Special Offer",
@@ -351,10 +351,6 @@ const sendPushNotification = (token) => {
   
   };
 
-
-
-  
-
   admin
     .messaging()
     .send(message)
@@ -366,7 +362,7 @@ const sendPushNotification = (token) => {
     });
 };
 
-cron.schedule("*/5 * * * * *", async () => {
+cron.schedule("*/10 * * * * *", async () => {
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
   const inactiveUsers = await User.find({
