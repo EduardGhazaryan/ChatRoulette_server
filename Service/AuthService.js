@@ -6,8 +6,9 @@ const { DateTime } = require('luxon');
 
 
 const getCurrentDateTime = () => {
-    const currentTimeInArmenia = DateTime.now().setZone('Asia/Yerevan');    
-    const formattedTime = currentTimeInArmenia.toUTC().toISO({ suppressMilliseconds: false });
+    const currentTimeInArmenia = DateTime.now().setZone('Asia/Yerevan');
+
+    const formattedTime = currentTimeInArmenia.toUTC().toISO({ suppressMilliseconds: false, format: 'extended' });
     console.log("formatedDate--------",formattedTime);
     return formattedTime
 };
