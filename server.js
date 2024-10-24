@@ -136,183 +136,183 @@ app.post("/api/save-token", async (req, res) => {
   }
 });
 
-// app.post("/api/user/addChat", async (req, res) => {
-//   try {
-//     const { roomId, chat, userId,participantId ,save } = req.body;
-//     const language = req.headers["accept-language"];
+app.post("/api/user/addChat", async (req, res) => {
+  try {
+    const { roomId, chat, userId,participantId ,save } = req.body;
+    const language = req.headers["accept-language"];
 
-//     if ((roomId, chat, userId)) {
-//       const user = await User.findById(userId);
-//       if (user) {
+    if ((roomId, chat, userId)) {
+      const user = await User.findById(userId);
+      if (user) {
        
-//           findRoom = newRoomConnect.find((r) => r.roomId === roomId);
-//         //   let participantID = findRoom?.roomMembers?.find(
-//         //     (u) => u !== user.socketID
-//         //   );
-//           let findEnded = room_ended.find((r) => r.roomId === roomId);
+          findRoom = newRoomConnect.find((r) => r.roomId === roomId);
+        //   let participantID = findRoom?.roomMembers?.find(
+        //     (u) => u !== user.socketID
+        //   );
+          let findEnded = room_ended.find((r) => r.roomId === roomId);
 
-//           if (findEnded) {
-//             if (save === false) {
-//               let state = false;
-//               room_ended.map((el) => {
-//                 if (el.roomId === roomId) {
-//                   el.endCount += 1;
-//                   el.notSaveCount += 1;
-//                   if (el.endCount === 2) {
-//                     // if (chat) {
-//                     // //   chat.map((el) => {
-//                     // //     if (el.imageUrl) {
-//                     // //       fs.unlink(`${el.imageUrl}`, (err) => {
-//                     // //         if (err) {
-//                     // //           console.error("Error deleting the file:", err);
-//                     // //           return;
-//                     // //         }
-//                     // //       });
-//                     // //     }
-//                     // //     if (el.voiceUrl) {
-//                     // //       fs.unlink(`${el.voiceUrl}`, (err) => {
-//                     // //         if (err) {
-//                     // //           console.error("Error deleting the file:", err);
-//                     // //           return;
-//                     // //         }
-//                     // //       });
-//                     // //     }
-//                     // //   });
+          if (findEnded) {
+            if (save === false) {
+              let state = false;
+              room_ended.map((el) => {
+                if (el.roomId === roomId) {
+                  el.endCount += 1;
+                  el.notSaveCount += 1;
+                  if (el.endCount === 2) {
+                    // if (chat) {
+                    // //   chat.map((el) => {
+                    // //     if (el.imageUrl) {
+                    // //       fs.unlink(`${el.imageUrl}`, (err) => {
+                    // //         if (err) {
+                    // //           console.error("Error deleting the file:", err);
+                    // //           return;
+                    // //         }
+                    // //       });
+                    // //     }
+                    // //     if (el.voiceUrl) {
+                    // //       fs.unlink(`${el.voiceUrl}`, (err) => {
+                    // //         if (err) {
+                    // //           console.error("Error deleting the file:", err);
+                    // //           return;
+                    // //         }
+                    // //       });
+                    // //     }
+                    // //   });
 
 					
-//                     // }
+                    // }
 
-// 					fs.unlink(`uploads/${roomId}`, (err) => {
-// 						if (err) {
-// 						  console.error("Error deleting the file:", err);
-// 						  return;
-// 						}
-// 					  });
+					fs.unlink(`uploads/${roomId}`, (err) => {
+						if (err) {
+						  console.error("Error deleting the file:", err);
+						  return;
+						}
+					  });
 
-//                       state = true;
-//                   }
+                      state = true;
+                  }
 
-//                   if (el.saveCount + el.notSaveCount === 2) {
-//                     state = true;
-//                   }
-//                 }
-//               });
+                  if (el.saveCount + el.notSaveCount === 2) {
+                    state = true;
+                  }
+                }
+              });
 
-//               if (state) {
-//                 room_ended = room_ended.filter((r) => r.roomId !== roomId);
-//               }
-//             }
-//             if (save === true) {
-//               room_ended.map((el) => {
-//                 if (el.roomId === roomId) {
-//                   el.saveCount += 1;
-//                 }
-//               });
+              if (state) {
+                room_ended = room_ended.filter((r) => r.roomId !== roomId);
+              }
+            }
+            if (save === true) {
+              room_ended.map((el) => {
+                if (el.roomId === roomId) {
+                  el.saveCount += 1;
+                }
+              });
 
 
-// 			  let messageText = language === "am" ? "Նամակագրություն" : language === "ru" ? "Переписка" : "Chat";
-// 			  const createdAt = getCurrentDate();
-// 			const newChat = new Chats({
-// 			  userId,
-// 			  roomId,
-// 			  participantId : participantId,
-// 			  createdAt,
-// 			  chatName: `${messageText}/${createdAt}`,
-// 			  chat,
-// 			});
+			  let messageText = language === "am" ? "Նամակագրություն" : language === "ru" ? "Переписка" : "Chat";
+			  const createdAt = getCurrentDate();
+			const newChat = new Chats({
+			  userId,
+			  roomId,
+			  participantId : participantId,
+			  createdAt,
+			  chatName: `${messageText}/${createdAt}`,
+			  chat,
+			});
 	
-// 			await newChat.save();
+			await newChat.save();
 	
-// 			user.chats = [...user.chats, newChat._id];
-// 			await user.save();
+			user.chats = [...user.chats, newChat._id];
+			await user.save();
 
 
 
 
 
 
-//             }
-//           } else {
-//             room_ended.push({
-//               roomId: roomId,
-//               endCount: save === true ? 0 : 1,
-//               saveCount: save === true ? 1 : 0,
-//               notSaveCount: save === true ? 0 : 1,
-//             });
+            }
+          } else {
+            room_ended.push({
+              roomId: roomId,
+              endCount: save === true ? 0 : 1,
+              saveCount: save === true ? 1 : 0,
+              notSaveCount: save === true ? 0 : 1,
+            });
 
 
-// 			if (save === true) {
-// 				room_ended.map((el) => {
-// 				  if (el.roomId === roomId) {
-// 					el.saveCount += 1;
-// 				  }
-// 				});
+			if (save === true) {
+				room_ended.map((el) => {
+				  if (el.roomId === roomId) {
+					el.saveCount += 1;
+				  }
+				});
   
   
-// 				let messageText = language === "am" ? "Նամակագրություն" : language === "ru" ? "Переписка" : "Chat";
-// 				const createdAt = getCurrentDate();
-// 			  const newChat = new Chats({
-// 				userId,
-// 				roomId,
-// 				participantId : participantId,
-// 				createdAt,
-// 				chatName: `${messageText}/${createdAt}`,
-// 				chat,
-// 			  });
+				let messageText = language === "am" ? "Նամակագրություն" : language === "ru" ? "Переписка" : "Chat";
+				const createdAt = getCurrentDate();
+			  const newChat = new Chats({
+				userId,
+				roomId,
+				participantId : participantId,
+				createdAt,
+				chatName: `${messageText}/${createdAt}`,
+				chat,
+			  });
 	  
-// 			  await newChat.save();
+			  await newChat.save();
 	  
-// 			  user.chats = [...user.chats, newChat._id];
-// 			  await user.save();
+			  user.chats = [...user.chats, newChat._id];
+			  await user.save();
   
   
   
   
   
   
-// 			  }
+			  }
 
 
-//           }
+          }
        
 
    
         
 
-//         res.status(201).send({ message: "Chat was added", success: true });
-//       } else {
-//         if (language) {
-//           if (language === "am") {
-//             res
-//               .status(200)
-//               .send({ message: "Օգտատերը չի գտնվել", success: false });
-//             // return {status: 200, message: "Օգտատերը չի գտնվել", success:false}
-//           }
-//           if (language === "ru") {
-//             res
-//               .status(200)
-//               .send({ message: "Пользователь не найден", success: false });
-//             // return {status: 200, message: "Пользователь не найден", success:false}
-//           }
-//           if (language === "en") {
-//             res.status(200).send({ message: "User Not Found", success: false });
+        res.status(201).send({ message: "Chat was added", success: true });
+      } else {
+        if (language) {
+          if (language === "am") {
+            res
+              .status(200)
+              .send({ message: "Օգտատերը չի գտնվել", success: false });
+            // return {status: 200, message: "Օգտատերը չի գտնվել", success:false}
+          }
+          if (language === "ru") {
+            res
+              .status(200)
+              .send({ message: "Пользователь не найден", success: false });
+            // return {status: 200, message: "Пользователь не найден", success:false}
+          }
+          if (language === "en") {
+            res.status(200).send({ message: "User Not Found", success: false });
 
-//             // return {status: 200, message: "User Not Found", success:false}
-//           }
-//         } else {
-//           res.status(200).send({ message: "User Not Found", success: false });
+            // return {status: 200, message: "User Not Found", success:false}
+          }
+        } else {
+          res.status(200).send({ message: "User Not Found", success: false });
 
-//           // return {status: 200, message: "User Not Found", success:false}
-//         }
-//       }
-//     } else {
-//       res.status(400).send({ message: "Bad Request" });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).send({ message: "Internal Server Error" });
-//   }
-// });
+          // return {status: 200, message: "User Not Found", success:false}
+        }
+      }
+    } else {
+      res.status(400).send({ message: "Bad Request" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+});
 
 const serviceAccount = require("./chatandroid-f0d79-firebase-adminsdk-6y56u-66de292809.json");
 const Chats = require("./Model/Chats.js");
