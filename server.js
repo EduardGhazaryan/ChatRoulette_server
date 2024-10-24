@@ -202,7 +202,7 @@ const sendPushNotification = async (user) => {
 
 cron.schedule("*/10 * * * * *", async () => {
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-
+  console.log("last---login------",twentyFourHoursAgo);
   try {
     const inactiveUsers = await User.find({
       lastLogin: { $lt: twentyFourHoursAgo },
@@ -225,65 +225,6 @@ cron.schedule("*/10 * * * * *", async () => {
 
 
 
-
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount),
-// });
-
-// const sendPushNotification = (token) => {
-
-// console.log("notif----log-----",token);
-//   const message = {
-//     notification: {
-//       title: "Special Offer",
-//       body: "Try your Luck",
-//     },
-//     token: token,
-//     data: {
-      
-//     },
-//     apns: {
-//       headers: {
-//         'apns-priority': '10', 
-//         'apns-push-type': 'alert' 
-//       },
-//       payload: {
-//         aps: {
-//           alert: {
-//             title: "Special Offer",
-//             body: "Try your Luck",
-//           },
-//           sound: 'default'
-//         }
-//       }
-//     },    
-  
-//   };
-
-//   admin
-//     .messaging()
-//     .send(message)
-//     .then((response) => {
-//       console.log("Successfully sent message:", response);
-//     })
-//     .catch((error) => {
-//       console.log("Error sending message:", error);
-//     });
-// };
-
-// cron.schedule("*/10 * * * * *", async () => {
-//   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-
-//   const inactiveUsers = await User.find({
-//     lastLogin: { $lt: twentyFourHoursAgo },
-//   });
-
-//   const all_users = await User.find()
-
-//   all_users.forEach((user) => {
-//     sendPushNotification(user.firebaseToken);
-//   });
-// });
 
 //-----------------------Firebase end----------------
 
