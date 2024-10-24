@@ -210,9 +210,9 @@ cron.schedule("*/10 * * * * *", async () => {
     console.log("last---login--------",twentyFourHoursAgo);
     console.log("crone-------------",inactiveUsers);
 
-    // inactiveUsers.forEach((user) => {
-    //   sendPushNotification(user);
-    // });
+    inactiveUsers.forEach((user) => {
+      sendPushNotification(user);
+    });
 
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -312,9 +312,12 @@ io.on("connection", (socket) => {
     if(findUser && findParticipant){
       findUser.status = "offline"
       findParticipant.status = "offline"
+
+      await findUser.save()
+      await findParticipant.save()
     }
 
-    await Promise.all([findUser.save(), findParticipant.save()])
+  
 
     if(findRoomeEnded){
       console.log("true----------",findRoomeEnded,findNewRoomConnect);
