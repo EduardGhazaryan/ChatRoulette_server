@@ -19,7 +19,6 @@ const UserRouter = require("./Router/UserRouter.js");
 const User = require("./Model/User.js");
 const OnlineUsers = require("./Model/OnlineUsers.js");
 
-
 const app = express();
 Connection();
 const server = http.createServer(app);
