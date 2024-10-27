@@ -202,27 +202,50 @@ const sendPushNotification = async (user) => {
   }
 };
 
-cron.schedule("*/10 * * * * *", async () => {
+// cron.schedule('*/5 * * * *', async () => {
+//   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+//   try {
+//     const inactiveUsers = await User.find({
+//       lastLogin: { $lt: twentyFourHoursAgo },
+//     });
+    
+//     console.log("crone---",inactiveUsers);
+//     inactiveUsers.forEach((user) => {
+//       sendPushNotification(user);
+//     });
+
+//   } catch (error) {
+//     console.error("Error fetching users:", error);
+//   }
+// });
+
+
+
+cron.schedule('*/1 * * * *', async () => {
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // Set the time to the start of the day
+
   try {
     const inactiveUsers = await User.find({
       lastLogin: { $lt: twentyFourHoursAgo },
+      $or: [
+        { lastNotificationSent: { $exists: false } }, // No notification sent before
+        { lastNotificationSent: { $lt: today } } // Notification sent before today
+      ]
     });
     
-    console.log("last---login--------",twentyFourHoursAgo);
-    console.log("crone-------------",inactiveUsers);
-
-    inactiveUsers.forEach((user) => {
-      sendPushNotification(user);
+    console.log("cron---", inactiveUsers);
+    inactiveUsers.forEach(async (user) => {
+      await sendPushNotification(user); // Send notification
+      user.lastNotificationSent = new Date(); // Update last notification sent date
+      await user.save(); // Save the user document
     });
 
   } catch (error) {
     console.error("Error fetching users:", error);
   }
 });
-
-
-
 
 
 

@@ -1,3 +1,4 @@
+const OnlineUsers = require('../Model/OnlineUsers.js');
 const User = require('../Model/User.js');
 const { generateAccessToken } = require('../Utils/GenerateToken.js');
 const moment = require('moment-timezone');
@@ -6,13 +7,13 @@ const moment = require('moment-timezone');
 
 
 const getCurrentDateTime = () => {
-    const localDateTime = moment.tz('Asia/Yerevan');
+    const yerevanTime = moment.tz("Asia/Yerevan").format();
+    
 
-    const currentDateTime = localDateTime.utc().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
-    console.log("my-time--------",currentDateTime);
-    return currentDateTime
+    return yerevanTime
 };
+getCurrentDateTime()
 
 
 
@@ -98,7 +99,7 @@ const AuthService = {
                         findUser.status = "online"
                         findUser.socketID = socketID
                         findUser.lastLogin = loginTime
-                       
+                       console.log("login--------",loginTime);
                         await findUser.save()
 
 
@@ -209,10 +210,13 @@ const AuthService = {
     signOut: async(userId,language)=>{
         if(userId){
             let findUser = await User.findById(userId)
+            let findOnline = await OnlineUsers.findOne({user: userId})
     
-            if(findUser){
+            if(findUser && findOnline){
                 findUser.status = "offline"
+                findOnline.status = "offline"
                 await  findUser.save()
+                await findOnline.save()
 
                 if(language){
                     if(language === "am"){

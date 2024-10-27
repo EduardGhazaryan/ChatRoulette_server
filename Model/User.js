@@ -13,6 +13,7 @@ const UserSchema = new mongoose.Schema(
         phoneID: {type:String,required:true},
         access_token: {type:String, required:true},
         lastLogin: {type:Date},
+        lastNotificationSent: { type: Date, default: null },
         firebaseToken: {type: String, default:null}
     },
     {
