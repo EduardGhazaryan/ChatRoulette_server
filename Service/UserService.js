@@ -820,7 +820,8 @@ const UserService = {
         }
     },
     changePremium: async (id,state,language)=>{
-        if(id && state){
+        console.log("service---",id,state,language);
+        if(id){
             const user = await User.findById(id)
 
             if(user){
