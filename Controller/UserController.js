@@ -231,13 +231,10 @@ const UserController = {
     changePremium : async(req,res)=>{
         try {
             const {id,state} = req.body
-
-            const access_token = req?.headers?.authorization
-            const token = access_token.split(" ")[1]
             
             const language = req.headers["accept-language"]
 
-            const data = await UserService.changeBonus(id,state,language)
+            const data = await UserService.changePremium(id,state,language)
 
             if(data.status < 400){
                 if(data.success){
