@@ -240,7 +240,11 @@ const UserController = {
             const data = await UserService.changeBonus(id,state,language)
 
             if(data.status < 400){
-                
+                if(data.success){
+                    res.status(data.status).send({user : data.user, message:data.message ,success: data.success})
+                }else{
+                    res.status(data.status).send({message : data.message, success: data.success})
+                }
             }else{
                 res.status(data.status).send({message:data.message})
             }
