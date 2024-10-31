@@ -819,6 +819,46 @@ const UserService = {
             return {status: 400, message : "Bad Request"}
         }
     },
+    changePremium: async (id,state,language)=>{
+        if(id && state){
+            const user = await User.findById(id)
+
+            if(user){
+                user.premium = state
+                await user.save()
+
+                if(language){
+                    if(language === "am"){
+                        return {status: 202, message: "Օգտատիրոջ Պրեմիում կարգավիճակը փոխվել է", success:true,user}
+                    }
+                    if(language === "ru"){
+                        return {status: 202, message: "Премиум-статус пользователя был изменен", success:true,user}
+                    }
+                    if(language === "en"){
+                        return {status: 202, message: "User Premium Status was Changed", success:true, user}
+                    }
+                }else{
+                    return {status: 202, message: "User Premium Status was Changed", success:true, user}
+                }
+            }else{
+                if(language){
+                    if(language === "am"){
+                        return {status: 200, message: "Օգտատերը չի գտնվել", success:false}
+                    }
+                    if(language === "ru"){
+                        return {status: 200, message: "Пользователь не найден", success:false}
+                    }
+                    if(language === "en"){
+                        return {status: 200, message: "User Not Found", success:false}
+                    }
+                }else{
+                    return {status: 200, message: "User Not Found", success:false}
+                }
+            }
+        }else{
+            return {status: 400, message : "Bad Request"}
+        }
+    },
     stopSearch : async (userId,language)=>{
         if(userId){
             const user = await OnlineUsers.findOne({user:userId})
