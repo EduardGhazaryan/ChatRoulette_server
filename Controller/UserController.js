@@ -231,7 +231,6 @@ const UserController = {
     changePremium : async(req,res)=>{
         try {
             const {id,state} = req.body
-            console.log("controller",req.body)
             
             const language = req.headers["accept-language"]
 
