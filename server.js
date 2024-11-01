@@ -10,7 +10,7 @@ const uuid = require("uuid");
 const { v4: uuidv4 } = require("uuid");
 const multer = require("multer");
 const cron = require("node-cron");
-const ffmpeg = require("fluent-ffmpeg");
+const ffmpeg = require('fluent-ffmpeg');
 const streamifier = require("streamifier");
 
 
@@ -752,26 +752,26 @@ io.on("connection", (socket) => {
    
          // Convert WebM to AAC format
          ffmpeg(originalFilePath)
-            .toFormat('aac')
-            .on('error', (err) => {
-               console.error('Error converting voice message:', err);
-            })
-            .on('end', () => {
-               // Broadcast the converted file path to other users in the room
-               io.to(data.roomId).emit("receiveVoiceMessage", {
-                  socketID: data.socketID,
-                  userId: data.userId,
-                  voiceUrl: `uploads/${data.roomId}/${convertedFilename}`,
-                  messageID: id,
-                  messageTime,
-               });
-               
-               // Optionally, delete the original WebM file after conversion
-               fs.unlink(originalFilePath, (err) => {
-                  if (err) console.error('Error deleting WebM file:', err);
-               });
-            })
-            .save(convertedFilePath);
+   .toFormat('mp3')
+   .on('error', (err) => {
+      console.error('Error converting voice message:', err);
+   })
+   .on('end', () => {
+      // Broadcast the converted file path to other users in the room
+      io.to(data.roomId).emit("receiveVoiceMessage", {
+         socketID: data.socketID,
+         userId: data.userId,
+         voiceUrl: `uploads/${data.roomId}/${convertedFilename}`,
+         messageID: id,
+         messageTime,
+      });
+      
+      fs.unlink(originalFilePath, (err) => {
+         if (err) console.error('Error deleting WebM file:', err);
+      });
+   })
+   .save(convertedFilePath);
+
       });
    });
 
