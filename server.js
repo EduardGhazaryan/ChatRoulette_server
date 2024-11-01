@@ -10,6 +10,9 @@ const uuid = require("uuid");
 const { v4: uuidv4 } = require("uuid");
 const multer = require("multer");
 const cron = require("node-cron");
+const ffmpeg = require("fluent-ffmpeg");
+const streamifier = require("streamifier");
+
 
 const CorsOptions = require("./Config/CorsOptions.js");
 const Connection = require("./Utils/Connection.js");
@@ -230,16 +233,16 @@ cron.schedule('*/1 * * * *', async () => {
     const inactiveUsers = await User.find({
       lastLogin: { $lt: twentyFourHoursAgo },
       $or: [
-        { lastNotificationSent: { $exists: false } }, // No notification sent before
-        { lastNotificationSent: { $lt: today } } // Notification sent before today
+        { lastNotificationSent: { $exists: false } }, 
+        { lastNotificationSent: { $lt: today } } 
       ]
     });
     
     console.log("cron---", inactiveUsers);
     inactiveUsers.forEach(async (user) => {
-      await sendPushNotification(user); // Send notification
-      user.lastNotificationSent = new Date(); // Update last notification sent date
-      await user.save(); // Save the user document
+      await sendPushNotification(user); 
+      user.lastNotificationSent = new Date(); 
+      await user.save(); 
     });
 
   } catch (error) {
@@ -683,39 +686,80 @@ io.on("connection", (socket) => {
       
     });
 
-    socket.on("sendVoiceMessage", (data) => {
-      const voiceBlob = Buffer.from(new Uint8Array(data.voiceBlob));
+    // socket.on("sendVoiceMessage", (data) => {
+    //   const voiceBlob = Buffer.from(new Uint8Array(data.voiceBlob));
 
+    //   const now = new Date();
+    //   const hours = now.getHours().toString().padStart(2, "0");
+    //   const minutes = now.getMinutes().toString().padStart(2, "0");
+    //   const seconds = now.getSeconds().toString().padStart(2, "0");
+    //   let messageTime = `${hours}:${minutes}:${seconds}`;
+
+    //   let id = generateUniqueId();
+
+    //   // Save the voice message to the server
+	  // const folderPath = path.join(__dirname, "uploads", data.roomId);
+    //   const filename = `${uuidv4()}.webm`;
+    //   const filePath = path.join(folderPath, filename);
+	  // if (!fs.existsSync(folderPath)) {
+		// fs.mkdirSync(folderPath, { recursive: true });
+	  // }
+    //   fs.writeFile(filePath, voiceBlob, (err) => {
+    //     if (err) {
+    //       console.error("Error saving voice message:", err);
+    //       return;
+    //     }
+
+    //     // Broadcast the file path to other users in the room
+    //     io.to(data.roomId).emit("receiveVoiceMessage", {
+    //       socketID: data.socketID,
+    //       userId: data.userId,
+    //       voiceUrl: `uploads/${data.roomId}/${filename}`,
+    //       messageID: id,
+    //       messageTime,
+    //     });
+    //   });
+    // });
+
+
+    socket.on("sendVoiceMessage", (data) => {
+      const voiceBlob = Buffer.from(data.voiceBlob, "base64"); // Decode base64 data
       const now = new Date();
       const hours = now.getHours().toString().padStart(2, "0");
       const minutes = now.getMinutes().toString().padStart(2, "0");
       const seconds = now.getSeconds().toString().padStart(2, "0");
       let messageTime = `${hours}:${minutes}:${seconds}`;
-
       let id = generateUniqueId();
-
-      // Save the voice message to the server
-	  const folderPath = path.join(__dirname, "uploads", data.roomId);
-      const filename = `${uuidv4()}.webm`;
+    
+      const folderPath = path.join(__dirname, "uploads", data.roomId);
+      if (!fs.existsSync(folderPath)) {
+        fs.mkdirSync(folderPath, { recursive: true });
+      }
+    
+      const filename = `${uuidv4()}.aac`;
       const filePath = path.join(folderPath, filename);
-	  if (!fs.existsSync(folderPath)) {
-		fs.mkdirSync(folderPath, { recursive: true });
-	  }
-      fs.writeFile(filePath, voiceBlob, (err) => {
-        if (err) {
-          console.error("Error saving voice message:", err);
-          return;
-        }
-
-        // Broadcast the file path to other users in the room
-        io.to(data.roomId).emit("receiveVoiceMessage", {
-          socketID: data.socketID,
-          userId: data.userId,
-          voiceUrl: `uploads/${data.roomId}/${filename}`,
-          messageID: id,
-          messageTime,
-        });
-      });
+    
+      // Stream the Buffer into FFmpeg for direct AAC conversion
+      const inputStream = streamifier.createReadStream(voiceBlob);
+      const outputStream = fs.createWriteStream(filePath);
+    
+      ffmpeg(inputStream)
+        .inputFormat("webm") // Specify input format if known
+        .toFormat("aac")
+        .on("end", () => {
+          // Broadcast the AAC file path to other users in the room
+          io.to(data.roomId).emit("receiveVoiceMessage", {
+            socketID: data.socketID,
+            userId: data.userId,
+            voiceUrl: `uploads/${data.roomId}/${filename}`,
+            messageID: id,
+            messageTime,
+          });
+        })
+        .on("error", (err) => {
+          console.error("Error converting to AAC:", err);
+        })
+        .pipe(outputStream);
     });
 
     socket.on("isSaved",async (info)=>{
