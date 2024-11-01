@@ -723,44 +723,57 @@ io.on("connection", (socket) => {
 
 
     socket.on("sendVoiceMessage", (data) => {
-      const voiceBlob = Buffer.from(data.voiceBlob, "base64"); // Decode base64 data
+      const voiceBlob = Buffer.from(new Uint8Array(data.voiceBlob));
+   
       const now = new Date();
       const hours = now.getHours().toString().padStart(2, "0");
       const minutes = now.getMinutes().toString().padStart(2, "0");
       const seconds = now.getSeconds().toString().padStart(2, "0");
       let messageTime = `${hours}:${minutes}:${seconds}`;
+   
       let id = generateUniqueId();
-    
+   
       const folderPath = path.join(__dirname, "uploads", data.roomId);
+      const originalFilename = `${uuidv4()}.webm`;
+      const originalFilePath = path.join(folderPath, originalFilename);
+      const convertedFilename = `${uuidv4()}.aac`;
+      const convertedFilePath = path.join(folderPath, convertedFilename);
+   
       if (!fs.existsSync(folderPath)) {
-        fs.mkdirSync(folderPath, { recursive: true });
+         fs.mkdirSync(folderPath, { recursive: true });
       }
-    
-      const filename = `${uuidv4()}.aac`;
-      const filePath = path.join(folderPath, filename);
-    
-      // Stream the Buffer into FFmpeg for direct AAC conversion
-      const inputStream = streamifier.createReadStream(voiceBlob);
-      const outputStream = fs.createWriteStream(filePath);
-    
-      ffmpeg(inputStream)
-        .inputFormat("webm") // Specify input format if known
-        .toFormat("aac")
-        .on("end", () => {
-          // Broadcast the AAC file path to other users in the room
-          io.to(data.roomId).emit("receiveVoiceMessage", {
-            socketID: data.socketID,
-            userId: data.userId,
-            voiceUrl: `uploads/${data.roomId}/${filename}`,
-            messageID: id,
-            messageTime,
-          });
-        })
-        .on("error", (err) => {
-          console.error("Error converting to AAC:", err);
-        })
-        .pipe(outputStream);
-    });
+   
+      // Save the WebM file temporarily
+      fs.writeFile(originalFilePath, voiceBlob, (err) => {
+         if (err) {
+            console.error("Error saving voice message:", err);
+            return;
+         }
+   
+         // Convert WebM to AAC format
+         ffmpeg(originalFilePath)
+            .toFormat('aac')
+            .on('error', (err) => {
+               console.error('Error converting voice message:', err);
+            })
+            .on('end', () => {
+               // Broadcast the converted file path to other users in the room
+               io.to(data.roomId).emit("receiveVoiceMessage", {
+                  socketID: data.socketID,
+                  userId: data.userId,
+                  voiceUrl: `uploads/${data.roomId}/${convertedFilename}`,
+                  messageID: id,
+                  messageTime,
+               });
+               
+               // Optionally, delete the original WebM file after conversion
+               fs.unlink(originalFilePath, (err) => {
+                  if (err) console.error('Error deleting WebM file:', err);
+               });
+            })
+            .save(convertedFilePath);
+      });
+   });
 
     socket.on("isSaved",async (info)=>{
       let findEnded = room_ended.find((r) => r.roomId === info.roomId);
