@@ -12,6 +12,7 @@ const multer = require("multer");
 const cron = require("node-cron");
 const ffmpeg = require('fluent-ffmpeg');
 const streamifier = require("streamifier");
+const ejs=require("ejs")
 
 
 const CorsOptions = require("./Config/CorsOptions.js");
@@ -27,7 +28,8 @@ const moment = require('moment-timezone');
 const app = express();
 Connection();
 const server = http.createServer(app);
-
+app.set("view engine", "ejs")
+app.set("views",path.join(__dirname, "views"))
 app.use(cors(CorsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -40,7 +42,9 @@ const transporter = nodemailer.createTransport({
     pass: process.env.PASSWORD,
   },
 });
-
+app.get("/",async(req,res)=>{
+  res.render("index")
+})
 app.use("/api/auth", AuthRouter);
 app.use("/api/user", UserRouter);
 app.post("/api/mail", async (req, res) => {
@@ -302,7 +306,7 @@ function generateUniqueId() {
 
 
 const io = require("socket.io")(server, {
-  pingInterval: 25000, // Interval for sending pings (default: 25,000 ms)
+  pingInterval: 25000, 
   pingTimeout: 60000,
   cors: {
     origin: "http://localhost:3000",
@@ -920,6 +924,22 @@ app.get("/api/uploads/:roomId/:image", (req, res) => {
 	  res.status(500).send("Server error");
 	}
   });
+  app.get("/logo", (req, res) => {
+    try {
+      const roomId = req.params.roomId;
+      const image = req.params.image;
+      const imagePath = path.join(__dirname, "views", "images", "logo.png");
+    
+      if (fs.existsSync(imagePath)) {
+      res.sendFile(imagePath);
+      } else {
+      res.status(404).send("Image not found");
+      }
+    } catch (error) {
+      console.error("Error fetching the image:", error);
+      res.status(500).send("Server error");
+    }
+    });
 
 const PORT = process.env.PORT || 2000;
 
