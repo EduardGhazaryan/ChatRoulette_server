@@ -9,12 +9,56 @@
   <meta name="msapplication-TileColor" content="#ffffff">
   <meta name="apple-mobile-web-app-status-bar-style" content="#00aca3">
   <title>AllEven</title>
-  <link rel="icon" type="image/x-icon" href="favicon.svg">
+  <!-- <link rel="icon" type="image/x-icon" href="favicon.svg">
   <link rel="stylesheet" href="https://alleven.ru/styles/reset.css" type="text/css">
   <link rel="stylesheet" href="https://alleven.ru/styles/grid.css" type="text/css">
   <link rel="stylesheet" href="https://alleven.ru/styles/hello.css" type="text/css">
-  <link rel="stylesheet" href="additional.css" type="text/css">
+  <link rel="stylesheet" href="additional.css" type="text/css"> -->
 
+  <style>
+    .bg{
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-top: 70px;
+    }
+
+    .mobile{
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo{
+      width: 300px;
+      height: 200px;
+    }
+
+    .links{
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .company{
+      width: 500px;
+      text-align: center;
+    }
+
+    @media(max-width: 600px){
+      .company{
+        width: 300px;
+      }
+
+      .logo{
+      width: 200px;
+      height: 100px;
+    }
+    }
+  </style>
 </head>
 
 <body style="background: #b8b8cc;">
@@ -26,15 +70,19 @@
       <div class="mobile">
         <img class="logo" src="/logo" alt="">
         <p class="desc">Узнай, что происходит вокруг тебя.<br>Участвуй и делись впечатлениями</p>
-        <a class="googlePlay" href="https://play.google.com/"><img src="https://alleven.ru/img/google-play.svg" alt=""></a>
-        <a class="appStore" href="https://apps.apple.com/am"><img src="https://alleven.ru/img/app-store.svg" alt=""></a>
         <div class="links">
-          
+           <a class="googlePlay" href="https://play.google.com/"><img src="https://alleven.ru/img/google-play.svg" alt=""></a>
+          <a class="appStore" href="https://apps.apple.com/am"><img src="https://alleven.ru/img/app-store.svg" alt=""></a>
         </div>
-        <span style="position: absolute;bottom: 0; text-align: center;color: #00ADA6;font-size: 18px;  font-family: Source Sans Pro1 !important; ">Общество с ограниченной ответственностью "М-Групп"
+        <!-- <div class="links" style="position: absolute;"> -->
+          <a href="/document">Политика Конфиденциальности</a>
+        <!-- </div> -->
+        
+        <span class="company">Общество с ограниченной ответственностью "М-Групп"
           Адрес компании: 430005, Республика Мордовия, г Саранск, Советская ул, д. 9, этаж/каб. 3/6.
           ИНН 1300002787, КПП 130001001</span>
       </div>
+
     </div>
   </main>
 

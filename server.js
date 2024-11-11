@@ -45,6 +45,10 @@ const transporter = nodemailer.createTransport({
 app.get("/",async(req,res)=>{
   res.render("index")
 })
+
+app.get("/document",async(req,res)=>{
+  res.render("document")
+})
 app.use("/api/auth", AuthRouter);
 app.use("/api/user", UserRouter);
 app.post("/api/mail", async (req, res) => {
