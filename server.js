@@ -59,7 +59,7 @@ app.post("/api/mail", async (req, res) => {
     if (from && text) {
       const mailOptions = {
         from: process.env.EMAIL,
-        to: "webexprojects@gmail.com",
+        to: "limit01.am@gmail.com",
         subject: from,
         text: text,
       };
