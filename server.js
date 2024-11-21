@@ -151,7 +151,7 @@ app.post("/api/save-token", async (req, res) => {
 
 
 
-const serviceAccount = require("./chatandroid-f0d79-firebase-adminsdk-6y56u-2ec65e2101.json");
+const serviceAccount = require("./chatruletka-aa885-firebase-adminsdk-5fmmb-492254331f.json");
 const Chats = require("./Model/Chats.js");
 
 
