@@ -290,6 +290,16 @@ const UserController = {
             console.error(error)
             res.status(500).send({message:"Internal Server Error"})
         }
+    },
+    deleteUser : async(req,res)=>{
+        try {
+            const {id} = req.params
+            res.status(200).send({success:true})
+            
+        } catch (error) {
+            console.error(error)
+            res.status.send({message:"Internal Server Error"})
+        }
     }
 
 };

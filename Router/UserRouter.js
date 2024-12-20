@@ -26,5 +26,7 @@ UserRouter.put("/chat/:id", UserController.changeChat)
 
 UserRouter.delete("/chat/:id", UserController.deleteChat)
 
+UserRouter.delete("/delete/:id", UserController.deleteUser)
+
 
 module.exports = UserRouter;

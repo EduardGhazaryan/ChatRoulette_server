@@ -199,11 +199,10 @@ const sendPushNotification = async (user) => {
   } catch (error) {
     console.error("Error sending message:", error);
 
-    // Check for the specific error regarding invalid registration tokens
+  
     if (error.errorInfo && error.errorInfo.code === 'messaging/registration-token-not-registered') {
       console.log(`Removing invalid token for user ${user._id}`);
       try {
-        // Remove or invalidate the token in the database
         await User.updateOne({ _id: user._id }, { $unset: { firebaseToken: 1 } });
         console.log(`Token removed for user ${user._id}`);
       } catch (dbError) {
