@@ -151,7 +151,7 @@ app.post("/api/save-token", async (req, res) => {
 
 
 
-const serviceAccount = require("./chatruletka-aa885-firebase-adminsdk-5fmmb-879d466b24.json");
+const serviceAccount = require("./sms-aba78-firebase-adminsdk-u0tlr-fc63e7f863.json")
 const Chats = require("./Model/Chats.js");
 
 
@@ -212,45 +212,93 @@ const sendPushNotification = async (user) => {
   }
 };
 
-// cron.schedule('*/5 * * * *', async () => {
-//   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-//   try {
-//     const inactiveUsers = await User.find({
-//       lastLogin: { $lt: twentyFourHoursAgo },
-//     });
-    
-//     console.log("crone---",inactiveUsers);
-//     inactiveUsers.forEach((user) => {
-//       sendPushNotification(user);
-//     });
+const sendMessageNotification = async (user,content) => {
+  const token = user.firebaseToken;
 
-//   } catch (error) {
-//     console.error("Error fetching users:", error);
-//   }
-// });
+  if (!token) {
+    console.log(`User ${user._id} does not have a firebase token`);
+    return;
+  }
+
+  console.log("Sending message notification to:", token);
+
+  const message = {
+    notification: {
+      title: "New Message",
+      body: content,
+    },
+    token: token,
+    data: {},
+    apns: {
+      headers: {
+        'apns-priority': '10',
+        'apns-push-type': 'alert'
+      },
+      payload: {
+        aps: {
+          alert: {
+            title: "New Message",
+            body: content,
+          },
+          sound: 'default'
+        }
+      }
+    },
+  };
+
+  try {
+    const response = await admin.messaging().send(message);
+    console.log("Successfully sent message:", response);
+  } catch (error) {
+    console.error("Error sending message:", error);
+
+  
+    if (error.errorInfo && error.errorInfo.code === 'messaging/registration-token-not-registered') {
+      console.log(`Removing invalid token for user ${user._id}`);
+      try {
+        await User.updateOne({ _id: user._id }, { $unset: { firebaseToken: 1 } });
+        console.log(`Token removed for user ${user._id}`);
+      } catch (dbError) {
+        console.error(`Error updating database for user ${user._id}:`, dbError);
+      }
+    }
+  }
+};
+
+cron.schedule('*/10 * * * * *', async () => {
+
+});
+
+
+
 
 
 
 cron.schedule('*/1 * * * *', async () => {
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0); // Set the time to the start of the day
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  console.log("cron--log---", twentyFourHoursAgo);
 
   try {
-    const inactiveUsers = await User.find({
-      lastLogin: { $lt: twentyFourHoursAgo },
-      $or: [
-        { lastNotificationSent: { $exists: false } }, 
-        { lastNotificationSent: { $lt: today } } 
-      ]
-    });
-    
-    console.log("cron---", inactiveUsers);
-    inactiveUsers.forEach(async (user) => {
-      await sendPushNotification(user); 
-      user.lastNotificationSent = new Date(); 
-      await user.save(); 
-    });
+    const allUsers = await User.find()
+    allUsers.map(async (user)=>{
+      if(user.lastNotificationSent){
+        if(user.lastLogin < twentyFourHoursAgo &&  user.lastNotificationSent < twentyFourHoursAgo){
+          await sendPushNotification(user); 
+          user.lastNotificationSent = new Date(); 
+          await user.save(); 
+        }
+      }else{
+        if(user.lastLogin < twentyFourHoursAgo  ){
+          await sendPushNotification(user); 
+          user.lastNotificationSent = new Date(); 
+          await user.save(); 
+        }
+      }
+    })
+
 
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -333,75 +381,81 @@ io.on("connection", (socket) => {
       roomId: data.roomId,
     });
   });
-
-
-  socket.on("disconnect", async ()=>{
-    console.log("socket was disconnected--------",socket.id);
-    const findNewRoomConnect =  newRoomConnect?.find((r)=> r.roomMembers.includes(socket.id))
-    const findRoomeEnded = room_ended?.find((r)=> r.roomId === findNewRoomConnect?.roomId)
-    const participantID = findNewRoomConnect?.roomMembers?.find((u)=> u !== socket.id)
-    userCount = userCount.filter((u) => u.socketID !== socket.id);
-    const findUser = await OnlineUsers.findOne({socketID: socket.id})
-    const findParticipant = await OnlineUsers.findOne({socketID: participantID})
-
-    if(findUser && findParticipant){
-      findUser.status = "offline"
-      findParticipant.status = "offline"
-
-      await findUser.save()
-      await findParticipant.save()
-    }
-
   
 
-    if(findRoomeEnded){
-      console.log("true----------",findRoomeEnded,findNewRoomConnect);
-      room_ended.map((room)=>{
-        if(room.roomId === findNewRoomConnect.roomId){
-          room.endCount = room.endCount + 1
-          room.notSaveCount = room.notSaveCount + 1
-          return room
-        }else{
-          return room
-        }
-      })
-      newRoomConnect.map((r)=>{
-        if(r.roomId === findNewRoomConnect.roomId){
-          r.endCount  = r.endCount + 1
-          return r
-        }else{
-          return r
-        }
-      })
 
-      if(findRoomeEnded.endCount === 2){
-        console.log("endcount ===== 2--------------",findRoomeEnded);
-        if(findRoomeEnded.notSaveCount === 2){
-          		fs.unlink(`uploads/${findRoom.roomId}`, (err) => {
-				        if (err) {
-					        console.error("Error deleting the file:", err);
-					        return;
-				        }
-				      });
-        }
-
-        room_ended = room_ended.filter((r)=> r.roomId !== findNewRoomConnect.roomId)
-        newRoomConnect = newRoomConnect.filter((r)=> r.roomId !== findNewRoomConnect.roomId)
-
-      }
-
-      if(findRoomeEnded.endCount === 1){
-        console.log("will--work--emit----=-----", findRoomeEnded);
-        socket.to(participantID).emit("end_chat", {message:"Zrucakicy lqec chaty"})
-      }
-    }
-
-
-
-  })
-
+  socket.on("disconnect", async () => {
+      console.log("socket was disconnected--------", socket.id);
   
-
+      const findNewRoomConnect = newRoomConnect?.find((r) => r.roomMembers.includes(socket.id));
+      const findRoomeEnded = room_ended?.find((r) => r.roomId === findNewRoomConnect?.roomId);
+      const participantID = findNewRoomConnect?.roomMembers?.find((u) => u !== socket.id);
+  
+      userCount = userCount.filter((u) => u.socketID !== socket.id);
+  
+      const findUser = await OnlineUsers.findOne({ socketID: socket.id });
+      const findParticipant = await OnlineUsers.findOne({ socketID: participantID });
+  
+      if (findUser && findParticipant) {
+          findUser.status = "offline";
+          findParticipant.status = "offline";
+  
+          await findUser.save();
+          await findParticipant.save();
+      }
+  
+      console.log("sokcet-disconnect---", findRoomeEnded);
+  
+      if (findRoomeEnded) {
+          console.log("true----------", findRoomeEnded, findNewRoomConnect);
+  
+          room_ended = room_ended.map((room) => {
+              if (room.roomId === findNewRoomConnect.roomId) {
+                  room.endCount += 1;
+                  room.notSaveCount += 1;
+                  return room;
+              } else {
+                  return room;
+              }
+          });
+  
+          newRoomConnect = newRoomConnect.map((r) => {
+              if (r.roomId === findNewRoomConnect.roomId) {
+                  r.endCount += 1;
+                  return r;
+              } else {
+                  return r;
+              }
+          });
+  
+          if (findRoomeEnded.endCount === 2) {
+              console.log("endcount ===== 2--------------", findRoomeEnded);
+  
+              if (findRoomeEnded.notSaveCount === 2) {
+                  const directoryPath = `uploads/${findRoomeEnded.roomId}`;
+                  console.log(`Attempting to delete: ${directoryPath}`);
+  
+                  // Delete the directory
+                  fs.rm(directoryPath, { recursive: true, force: true }, (err) => {
+                      if (err) {
+                          console.error("Error deleting the directory:", err);
+                          return;
+                      }
+                      console.log(`Directory ${directoryPath} deleted successfully`);
+                  });
+              }
+  
+              room_ended = room_ended.filter((r) => r.roomId !== findNewRoomConnect.roomId);
+              newRoomConnect = newRoomConnect.filter((r) => r.roomId !== findNewRoomConnect.roomId);
+          }
+  
+          if (findRoomeEnded.endCount === 1) {
+              console.log("will--work--emit----=-----", findRoomeEnded);
+              socket.to(participantID).emit("end_chat", { message: "Zrucakicy lqec chaty" });
+          }
+      }
+  });
+  
 
 
   socket.on("join", async (payload) => {
@@ -527,6 +581,9 @@ io.on("connection", (socket) => {
 
       let id = generateUniqueId();
       console.log("gnacox message-----");
+      if(findUser && message.content){
+        sendMessageNotification(findUser,message.content)
+      }
       io.to(roomId).emit("createMessage", {
         ...message,
         messageID: id,
@@ -624,55 +681,7 @@ io.on("connection", (socket) => {
 
 
 
-        
-        // interval = setTimeout(() => {
-        //   let findEnded = room_ended.find((r) => r.roomId === info.roomId);
-        //   if (findEnded) {
-        //     if(findEnded.endCount !== 2){
-        //       room_ended.map((el)=>{
-        //         if(el.roomId === info.roomId){
-        //           el.notSaveCount += 1
-        //           el.endCount += 1
-
-        //           if(el.notSaveCount === 2){
-        //             fs.rm(`uploads/${el.roomId}`, { recursive: true, force: true }, (err) => {
-        //               if (err) {
-        //                 console.error("Error deleting the folder:", err);
-        //                 return;
-        //               }
-        //               console.log("Folder successfully deleted.");
-        //             })
-
-                   
-                    
-        //           }
-
-        //           return el
-
-        //         }else{
-        //           return el
-        //         }
-        //       })
-
-        //       let newFindEnded = room_ended.find((r) => r.roomId === info.roomId);
-        //       if(newFindEnded.endCount === 2){
-        //         room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
-        //       }
-
-        //       socket.emit("endTimeOut", {message: "timeout is ended", end:true})
-        //     } 
-        //   }else{
-        //     room_ended.push({
-        //       roomId: info.roomId,
-        //       endCount: 1,
-        //       saveCount: 0,
-        //       notSaveCount: 1,
-        //     });
-
-        //     socket.emit("endTimeOut", {message: "timeout is ended", end:true})
-        //   }
-        // }, 60000);
-
+ 
       intervalUsers.push(
         {
           userId : info.userId, 
@@ -693,42 +702,7 @@ io.on("connection", (socket) => {
       
     });
 
-    // socket.on("sendVoiceMessage", (data) => {
-    //   const voiceBlob = Buffer.from(new Uint8Array(data.voiceBlob));
-
-    //   const now = new Date();
-    //   const hours = now.getHours().toString().padStart(2, "0");
-    //   const minutes = now.getMinutes().toString().padStart(2, "0");
-    //   const seconds = now.getSeconds().toString().padStart(2, "0");
-    //   let messageTime = `${hours}:${minutes}:${seconds}`;
-
-    //   let id = generateUniqueId();
-
-    //   // Save the voice message to the server
-	  // const folderPath = path.join(__dirname, "uploads", data.roomId);
-    //   const filename = `${uuidv4()}.webm`;
-    //   const filePath = path.join(folderPath, filename);
-	  // if (!fs.existsSync(folderPath)) {
-		// fs.mkdirSync(folderPath, { recursive: true });
-	  // }
-    //   fs.writeFile(filePath, voiceBlob, (err) => {
-    //     if (err) {
-    //       console.error("Error saving voice message:", err);
-    //       return;
-    //     }
-
-    //     // Broadcast the file path to other users in the room
-    //     io.to(data.roomId).emit("receiveVoiceMessage", {
-    //       socketID: data.socketID,
-    //       userId: data.userId,
-    //       voiceUrl: `uploads/${data.roomId}/${filename}`,
-    //       messageID: id,
-    //       messageTime,
-    //     });
-    //   });
-    // });
-
-
+ 
     socket.on("sendVoiceMessage", (data) => {
       const voiceBlob = Buffer.from(new Uint8Array(data.voiceBlob));
    
@@ -860,7 +834,7 @@ io.on("connection", (socket) => {
       }else{
         let findEnd = room_ended.find((r) => r.roomId === info.roomId);
 
-        if(findEnd.endCount === 2){
+        if(findEnd && findEnd.endCount === 2){
           if(findEnd.notSaveCount === 2){
           
             fs.rm(`uploads/${findEnd.roomId}`, { recursive: true, force: true }, (err) => {
@@ -951,4 +925,4 @@ const PORT = process.env.PORT || 2000;
 
 
 
-server.listen(PORT, () => console.log(`server is running on ${PORT}`));
+server.listen(PORT , () => console.log(`server is running on ${PORT}`));

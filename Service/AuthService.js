@@ -18,7 +18,7 @@ getCurrentDateTime()
 
 
 const AuthService = {
-    signUp: async (gender, age, nickname,socketID,phoneID,language,timezone) => {
+    signUp: async (gender, age, nickname,socketID,phoneID,language,timezone,firebaseToken) => {
        
         if (gender && age && nickname) {
             const findUser = await User.findOne({ nickname });
@@ -47,7 +47,8 @@ const AuthService = {
                     gender,
                     nickname,
                     socketID,
-                    phoneID
+                    phoneID,
+                    firebaseToken
                 }
           
                 const access_token = generateAccessToken(userObj);
@@ -59,7 +60,8 @@ const AuthService = {
                     socketID,
                     phoneID,
                     access_token,
-                    lastLogin: loginTime 
+                    lastLogin: loginTime,
+                    firebaseToken
                 });
 
 
@@ -88,7 +90,7 @@ const AuthService = {
             return { status: 400, message: "Bad Request" };
         }
     },
-    signIn : async (nickname,socketID,phoneID,language,timezone)=>{
+    signIn : async (nickname,socketID,phoneID,language,timezone,firebaseToken)=>{
         if(nickname && socketID, phoneID){
             let findUser = await User.findOne({nickname})
 
@@ -99,6 +101,7 @@ const AuthService = {
                         findUser.status = "online"
                         findUser.socketID = socketID
                         findUser.lastLogin = loginTime
+                        findUser.firebaseToken = firebaseToken
                        console.log("login--------",loginTime);
                         await findUser.save()
 
@@ -168,6 +171,7 @@ const AuthService = {
                 findUser.status = "online"
                 findUser.socketID = socketID
                 findUser.lastLogin = loginTime
+
                 
                 await findUser.save()
 

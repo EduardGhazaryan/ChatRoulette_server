@@ -160,6 +160,7 @@ const UserController = {
             const access_token = req?.headers?.authorization
             const token = access_token.split(" ")[1]
             const language = req.headers["accept-language"]
+            console.log("complain-----", userId,type);
 
             const data = await UserService.complain(token,userId,type,language)
 
