@@ -175,7 +175,9 @@ const sendPushNotification = async (user) => {
       body: "Try your Luck",
     },
     token: token,
-    data: {},
+    data: {
+      ruletka : "true"
+    },
     apns: {
       headers: {
         'apns-priority': '10',

@@ -20,7 +20,7 @@ getCurrentDateTime()
 const AuthService = {
     signUp: async (gender, age, nickname,socketID,phoneID,language,timezone,firebaseToken) => {
        
-        if (gender && age && nickname) {
+        if (gender && age && nickname && firebaseToken) {
             const findUser = await User.findOne({ nickname });
         
             
@@ -91,7 +91,7 @@ const AuthService = {
         }
     },
     signIn : async (nickname,socketID,phoneID,language,timezone,firebaseToken)=>{
-        if(nickname && socketID, phoneID){
+        if(nickname && socketID && phoneID && firebaseToken){
             let findUser = await User.findOne({nickname})
 
             if(findUser){
@@ -163,7 +163,7 @@ const AuthService = {
         }
     },
     signInToken : async (token,socketID,language,timezone,firebaseToken)=>{
-        if(token){
+        if(token,firebaseToken){
             const findUser = await User.findOne({access_token :token})
 
             if(findUser){
