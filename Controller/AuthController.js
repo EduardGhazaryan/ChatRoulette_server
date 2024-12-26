@@ -47,7 +47,7 @@ const AuthController = {
     },
     signInToken :async (req,res)=>{
         try {
-            const {socketID,timezone} = req.body
+            const {socketID,timezone,firebaseToken} = req.body
             const access_token = req?.headers?.authorization
             const token = access_token.split(" ")[1]
 
@@ -57,7 +57,7 @@ const AuthController = {
             console.log("socketID------", socketID);
             console.log("language------",language);
 
-            const data = await AuthService.signInToken(token,socketID,language,timezone)
+            const data = await AuthService.signInToken(token,socketID,language,timezone,firebaseToken)
 
             if(data.status === 201 || data.status === 200){
                 if(data.success){

@@ -162,7 +162,7 @@ const AuthService = {
             return {status:400, message :"Bad Request"}
         }
     },
-    signInToken : async (token,socketID,language,timezone)=>{
+    signInToken : async (token,socketID,language,timezone,firebaseToken)=>{
         if(token){
             const findUser = await User.findOne({access_token :token})
 
@@ -171,7 +171,7 @@ const AuthService = {
                 findUser.status = "online"
                 findUser.socketID = socketID
                 findUser.lastLogin = loginTime
-
+                findUser.firebaseToken = firebaseToken
                 
                 await findUser.save()
 

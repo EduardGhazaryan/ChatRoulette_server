@@ -130,7 +130,7 @@ const getCurrentDate = () => {
 app.post("/api/save-token", async (req, res) => {
   try {
     const { token, phoneID } = req.body;
-
+    console.log("save-token------",{token,phoneID});
     if (token && phoneID) {
       const findUser = await User.findOne({ phoneID });
       if (findUser) {
@@ -265,9 +265,9 @@ const sendMessageNotification = async (user,content) => {
   }
 };
 
-cron.schedule('*/10 * * * * *', async () => {
+// cron.schedule('*/10 * * * * *', async () => {
 
-});
+// });
 
 
 
