@@ -387,43 +387,7 @@ const sendMessageNotification = async (user,content) => {
   }
 };
 
-cron.schedule('*/10 * * * * *', async () => {
-  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const startOfDay = new Date();
-  startOfDay.setHours(0, 0, 0, 0);
-
-  console.log("cron--log---", twentyFourHoursAgo);
-
-  try {
-    const allUsers = await User.find()
-    allUsers.map(async (user)=>{
-      if(user.lastNotificationSent){
-        if(user.lastLogin < twentyFourHoursAgo &&  user.lastNotificationSent < twentyFourHoursAgo){
-          await sendPushNotification(user); 
-          user.lastNotificationSent = new Date(); 
-          await user.save(); 
-        }
-      }else{
-        if(user.lastLogin < twentyFourHoursAgo  ){
-          await sendPushNotification(user); 
-          user.lastNotificationSent = new Date(); 
-          await user.save(); 
-        }
-      }
-    })
-
-
-  } catch (error) {
-    console.error("Error fetching users:", error);
-  }
-});
-
-
-
-
-
-
-// cron.schedule('*/1 * * * *', async () => {
+// cron.schedule('*/10 * * * * *', async () => {
 //   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 //   const startOfDay = new Date();
 //   startOfDay.setHours(0, 0, 0, 0);
@@ -453,6 +417,42 @@ cron.schedule('*/10 * * * * *', async () => {
 //     console.error("Error fetching users:", error);
 //   }
 // });
+
+
+
+
+
+
+cron.schedule('*/1 * * * *', async () => {
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+
+  console.log("cron--log---", twentyFourHoursAgo);
+
+  try {
+    const allUsers = await User.find()
+    allUsers.map(async (user)=>{
+      if(user.lastNotificationSent){
+        if(user.lastLogin < twentyFourHoursAgo &&  user.lastNotificationSent < twentyFourHoursAgo){
+          await sendPushNotification(user); 
+          user.lastNotificationSent = new Date(); 
+          await user.save(); 
+        }
+      }else{
+        if(user.lastLogin < twentyFourHoursAgo  ){
+          await sendPushNotification(user); 
+          user.lastNotificationSent = new Date(); 
+          await user.save(); 
+        }
+      }
+    })
+
+
+  } catch (error) {
+    console.error("Error fetching users:", error);
+  }
+});
 
 
 
