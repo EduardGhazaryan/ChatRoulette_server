@@ -21,7 +21,7 @@ const getCurrentDate = () => {
   };
 
 const UserService = {
-    search: async (gender, maxAge, minAge,userId,socketID,language)=>{
+    search: async (gender, maxAge, minAge,userId,socketID,language,isLarge)=>{
         let newUser = null
        
         if(userId,socketID){
@@ -108,9 +108,48 @@ const UserService = {
                        
      
                      })
-                     let index = Math.floor(Math.random() * findUser.length)
+
+                     if(findUser.length > 0){
+                        let index = Math.floor(Math.random() * findUser.length)
                      
-                     return {status:200, user: onlineUsers[index],success:true}
+                        return {status:200, user: onlineUsers[index],success:true}
+                     }else{
+                        if(language){
+                            if(language ==="am"){
+                                if(isLarge){
+                                    return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false, isLarge:true}
+                                }else{
+                                    return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել կատարվում է ընդլայնված որոնում", success:false, isLarge:false}
+                                }
+                                
+                            }
+                            if(language ==="ru"){
+                                if(isLarge){
+                                    return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false, isLarge:true}
+                                }else{
+                                    return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами выполняем расширенный поиск", success:false, isLarge:true}
+                                }
+                                
+                            }
+                            if(language ==="en"){
+                                if(isLarge){
+                                    return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:true}
+                                }else{
+                                    return{status: 200, message: "We didn't find any User With These parameters perform an advanced search", success:false,isLarge: false}
+                                }
+                                
+                            }
+            
+                        }else{
+                            if(isLarge){
+                                return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:true}
+                            }else{
+                                return{status: 200, message: "We didn't find any User With These parameters perform an advanced search", success:false,isLarge: false}
+                            }
+                        }
+                     }
+
+                     
                  }
                  if(gender && !maxAge && !minAge){
                      
@@ -156,6 +195,7 @@ const UserService = {
                              }
                          }
                      } )
+
                      let index = Math.floor(Math.random() * findUserGender.length)
                    
                      if(findUserGender.length > 0){
@@ -163,18 +203,37 @@ const UserService = {
                      }else{
      
                          if(language){
-                             if(language ==="am"){
-                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false}
-                             }
-                             if(language ==="ru"){
-                                 return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false}
-                             }
-                             if(language ==="en"){
-                                 return{status: 200, message: "We didn't find any User With These parameters", success:false}
-                             }
+                            if(language ==="am"){
+                                if(isLarge){
+                                    return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false, isLarge:true}
+                                }else{
+                                    return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել կատարվում է ընդլայնված որոնում", success:false, isLarge:false}
+                                }
+                                
+                            }
+                            if(language ==="ru"){
+                                if(isLarge){
+                                    return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false, isLarge:true}
+                                }else{
+                                    return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами выполняем расширенный поиск", success:false, isLarge:true}
+                                }
+                                
+                            }
+                            if(language ==="en"){
+                                if(isLarge){
+                                    return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:true}
+                                }else{
+                                    return{status: 200, message: "We didn't find any User With These parameters perform an advanced search", success:false,isLarge: false}
+                                }
+                                
+                            }
              
                          }else{
-                             return{status: 200, message: "We didn't find any User With These parameters",success:false}
+                            if(isLarge){
+                                return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:true}
+                            }else{
+                                return{status: 200, message: "We didn't find any User With These parameters perform an advanced search", success:false,isLarge: false}
+                            }
                          }
                          
                      }
@@ -231,17 +290,17 @@ const UserService = {
                      }else{
                          if(language){
                              if(language ==="am"){
-                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false}
+                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false,isLarge:false}
                              }
                              if(language ==="ru"){
-                                 return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false}
+                                 return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false,isLarge:false}
                              }
                              if(language ==="en"){
-                                 return{status: 200, message: "We didn't find any User With These parameters", success:false}
+                                 return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:false}
                              }
              
                          }else{
-                             return{status: 200, message: "We didn't find any User With These parameters",success:false}
+                             return{status: 200, message: "We didn't find any User With These parameters",success:false,isLarge:false}
                          }
                      }
                     
@@ -298,17 +357,17 @@ const UserService = {
                      }else{
                          if(language){
                              if(language ==="am"){
-                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false}
+                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false,isLarge:false}
                              }
                              if(language ==="ru"){
-                                 return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false}
+                                 return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false,isLarge:false}
                              }
                              if(language ==="en"){
-                                 return{status: 200, message: "We didn't find any User With These parameters", success:false}
+                                 return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:false}
                              }
              
                          }else{
-                             return{status: 200, message: "We didn't find any User With These parameters",success:false}
+                             return{status: 200, message: "We didn't find any User With These parameters",success:false,isLarge:false}
                          }
                      }
                    
@@ -363,17 +422,17 @@ const UserService = {
                      }else{
                          if(language){
                              if(language ==="am"){
-                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false}
+                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false,isLarge:false}
                              }
                              if(language ==="ru"){
-                                 return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false}
+                                 return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false,isLarge:false}
                              }
                              if(language ==="en"){
-                                 return{status: 200, message: "We didn't find any User With These parameters", success:false}
+                                 return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:false}
                              }
              
                          }else{
-                             return{status: 200, message: "We didn't find any User With These parameters",success:false}
+                             return{status: 200, message: "We didn't find any User With These parameters",success:false,isLarge:false}
                          }
                      }
                  
@@ -428,17 +487,17 @@ const UserService = {
                      }else{
                          if(language){
                              if(language ==="am"){
-                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false}
+                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false,isLarge:false}
                              }
                              if(language ==="ru"){
-                                 return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false}
+                                 return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false,isLarge:false}
                              }
                              if(language ==="en"){
-                                 return{status: 200, message: "We didn't find any User With These parameters", success:false}
+                                 return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:false}
                              }
              
                          }else{
-                             return{status: 200, message: "We didn't find any User With These parameters",success:false}
+                             return{status: 200, message: "We didn't find any User With These parameters",success:false,isLarge:false}
                          }
                      }
                     
@@ -494,17 +553,17 @@ const UserService = {
                      }else{
                          if(language){
                              if(language ==="am"){
-                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false}
+                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false,isLarge:false}
                              }
                              if(language ==="ru"){
-                                 return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false}
+                                 return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false,isLarge:false}
                              }
                              if(language ==="en"){
-                                 return{status: 200, message: "We didn't find any User With These parameters", success:false}
+                                 return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:false}
                              }
              
                          }else{
-                             return{status: 200, message: "We didn't find any User With These parameters",success:false}
+                             return{status: 200, message: "We didn't find any User With These parameters",success:false,isLarge:false}
                          }
                      }
                  
@@ -559,17 +618,17 @@ const UserService = {
                      }else{
                          if(language){
                              if(language ==="am"){
-                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false}
+                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false,isLarge:false}
                              }
                              if(language ==="ru"){
-                                 return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false}
+                                 return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false,isLarge:false}
                              }
                              if(language ==="en"){
-                                 return{status: 200, message: "We didn't find any User With These parameters", success:false}
+                                 return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:false}
                              }
              
                          }else{
-                             return{status: 200, message: "We didn't find any User With These parameters",success:false}
+                             return{status: 200, message: "We didn't find any User With These parameters",success:false,isLarge:false}
                          }
                      }
                    
@@ -583,18 +642,34 @@ const UserService = {
                 
                  if(language){
                      if(language ==="am"){
-                         
-                         return {status: 200, message: "Տվյալ պահին օնլայն օգտատերեր չկան:", success: false}
+                        if(isLarge){
+                            return {status: 200, message: "Տվյալ պահին օնլայն օգտատերեր չկան:", success: false, isLarge:true}
+                        }else{
+                            return {status: 200, message: "Տվյալ պահին օնլայն օգտատերեր չկան:", success: false,isLarge:false}
+                        }
                      }
                      if(language ==="ru"){
-                         return {status: 200, message: "В настоящее время нет онлайн-пользователей.", success: false}
+                        if(isLarge){
+                            return {status: 200, message: "В настоящее время нет онлайн-пользователей.", success: false,isLarge:true}
+                        }else{
+                            return {status: 200, message: "В настоящее время нет онлайн-пользователей.", success: false, isLarge:false}
+                        }
                      }
                      if(language ==="en"){
-                         return {status: 200, message: "There are currently no online users", success: false}
+                        if(isLarge){
+                            return {status: 200, message: "There are currently no online users", success: false, isLarge:true}
+                        }else{
+                            return {status: 200, message: "There are currently no online users", success: false, isLarge:false}
+                        }
+                         
                      }
      
                  }else{
-                     return {status: 200, message: "There are currently no online users", success: false}
+                    if(isLarge){
+                        return {status: 200, message: "There are currently no online users", success: false, isLarge:true}
+                    }else{
+                        return {status: 200, message: "There are currently no online users", success: false, isLarge:false}
+                    }
                  }
               
              }

@@ -4,7 +4,7 @@ const UserService = require('../Service/UserService.js');
 const UserController = {
     search: async (req, res) => {
         try {
-            const { gender, maxAge, minAge, socketID } = req.query;
+            const { gender, maxAge, minAge, socketID , isLarge} = req.query;
             const { id } = req.params;
             const language = req.headers["accept-language"] ? req.headers["accept-language"] : null;
     
@@ -13,11 +13,11 @@ const UserController = {
             const myGender = gender ? gender : null;
             const mySocketID = socketID ? socketID : null;
     
-            let data = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language);
+            let data = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language,isLarge);
             let count = 0;
             let interval;
     
-            // Listen for request closure to update the user's status
+            
             req.on('close', async () => {
                 console.log('Request closed by the client');
                 clearInterval(interval);  // Clear interval if the request is closed
@@ -40,17 +40,17 @@ const UserController = {
                 interval = setInterval(async () => {
                     if (count === 20) {
                         if (!res.headersSent) {
-                            res.status(200).send({ message: data.message, success: data.success });
+                            res.status(200).send({ message: data.message, success: data.success , isLarge:data.isLarge});
                         }
                         clearInterval(interval);
                     } else {
                         if (data.success) {
                             if (!res.headersSent) {
-                                res.status(data.status).send({ user: data.user, success: data.success });
+                                res.status(data.status).send({ user: data.user, success: data.success, isLarge:data.isLarge });
                             }
                             clearInterval(interval);
                         } else {
-                            let data2 = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language);
+                            let data2 = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language,isLarge);
                             data = data2;
                             count++;
                         }

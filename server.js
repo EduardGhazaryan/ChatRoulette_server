@@ -149,6 +149,95 @@ app.post("/api/save-token", async (req, res) => {
   }
 });
 
+const getPushNotification = async (token) => {
+  console.log("notif token---",token);
+  if (!token) {
+    console.log(`User  does not have a firebase token`);
+    return;
+  }
+
+  console.log("Sending notification to:", token);
+
+  // const message = {
+  //   notification: {
+  //     title: "Special Offer",
+  //     body: "Try your Luck",
+  //   },
+  //   token: token,
+  //   android: {
+  //     notification: {
+  //       channelId: "default", 
+  //       title: "Special Offer",
+  //       body: "Try your Luck",
+  //     },
+  //   },
+  //   apns: {
+  //     headers: {
+  //       'apns-priority': '10',
+  //       'apns-push-type': 'alert',
+  //     },
+  //     payload: {
+  //       aps: {
+  //         alert: {
+  //           title: "Special Offer",
+  //           body: "Try your Luck",
+  //         },
+  //         sound: 'default',
+  //       },
+  //     },
+  //   },
+  // };
+
+  const message = {
+    data: {
+      title: "Special Offer",
+      body: "Try your Luck",
+      customKey: "customValue" 
+    },
+    token: token,
+    android: {
+      notification: {
+        channelId: "default",
+        sound: "default",
+      },
+    },
+    apns: {
+      headers: {
+        'apns-priority': '10',
+        'apns-push-type': 'alert',
+      },
+      payload: {
+        aps: {
+          sound: 'default',
+        },
+      },
+    },
+  };
+  
+
+  try {
+    const response = await admin.messaging().send(message);
+    console.log("Successfully sent message:", response);
+  } catch (error) {
+    console.error("Error sending message:", error);
+  }
+};
+
+app.post("/api/getNotif", async(req,res)=>{
+  try {
+      const {token} = req.body
+
+      if(token){
+        getPushNotification(token)
+        res.status(200).send({message: "Notif Was Sended"})
+      }else{
+        res.status(400).send({message :"Bad Request"})
+      }
+
+  } catch (error) {
+    console.error(error)
+  }
+})
 
 
 const serviceAccount = require("./sms-aba78-firebase-adminsdk-u0tlr-fc63e7f863.json")
@@ -161,7 +250,7 @@ admin.initializeApp({
 
 const sendPushNotification = async (user) => {
   const token = user.firebaseToken;
-  
+  console.log("notif token---",token);
   if (!token) {
     console.log(`User ${user._id} does not have a firebase token`);
     return;
@@ -169,31 +258,62 @@ const sendPushNotification = async (user) => {
 
   console.log("Sending notification to:", token);
 
+  // const message = {
+  //   notification: {
+  //     title: "Special Offer",
+  //     body: "Try your Luck",
+  //   },
+  //   token: token,
+  //   android: {
+  //     notification: {
+  //       channelId: "default", 
+  //       title: "Special Offer",
+  //       body: "Try your Luck",
+  //     },
+  //   },
+  //   apns: {
+  //     headers: {
+  //       'apns-priority': '10',
+  //       'apns-push-type': 'alert',
+  //     },
+  //     payload: {
+  //       aps: {
+  //         alert: {
+  //           title: "Special Offer",
+  //           body: "Try your Luck",
+  //         },
+  //         sound: 'default',
+  //       },
+  //     },
+  //   },
+  // };
+
   const message = {
-    notification: {
+    data: {
       title: "Special Offer",
       body: "Try your Luck",
+      customKey: "customValue" 
     },
     token: token,
-    data: {
-      ruletka : "true"
+    android: {
+      notification: {
+        channelId: "default",
+        sound: "default",
+      },
     },
     apns: {
       headers: {
         'apns-priority': '10',
-        'apns-push-type': 'alert'
+        'apns-push-type': 'alert',
       },
       payload: {
         aps: {
-          alert: {
-            title: "Special Offer",
-            body: "Try your Luck",
-          },
-          sound: 'default'
-        }
-      }
+          sound: 'default',
+        },
+      },
     },
   };
+  
 
   try {
     const response = await admin.messaging().send(message);
@@ -267,16 +387,7 @@ const sendMessageNotification = async (user,content) => {
   }
 };
 
-// cron.schedule('*/10 * * * * *', async () => {
-
-// });
-
-
-
-
-
-
-cron.schedule('*/1 * * * *', async () => {
+cron.schedule('*/10 * * * * *', async () => {
   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
@@ -306,6 +417,42 @@ cron.schedule('*/1 * * * *', async () => {
     console.error("Error fetching users:", error);
   }
 });
+
+
+
+
+
+
+// cron.schedule('*/1 * * * *', async () => {
+//   const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+//   const startOfDay = new Date();
+//   startOfDay.setHours(0, 0, 0, 0);
+
+//   console.log("cron--log---", twentyFourHoursAgo);
+
+//   try {
+//     const allUsers = await User.find()
+//     allUsers.map(async (user)=>{
+//       if(user.lastNotificationSent){
+//         if(user.lastLogin < twentyFourHoursAgo &&  user.lastNotificationSent < twentyFourHoursAgo){
+//           await sendPushNotification(user); 
+//           user.lastNotificationSent = new Date(); 
+//           await user.save(); 
+//         }
+//       }else{
+//         if(user.lastLogin < twentyFourHoursAgo  ){
+//           await sendPushNotification(user); 
+//           user.lastNotificationSent = new Date(); 
+//           await user.save(); 
+//         }
+//       }
+//     })
+
+
+//   } catch (error) {
+//     console.error("Error fetching users:", error);
+//   }
+// });
 
 
 
