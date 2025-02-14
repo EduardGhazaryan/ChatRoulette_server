@@ -428,8 +428,6 @@ cron.schedule('*/1 * * * *', async () => {
   const startOfDay = new Date();
   startOfDay.setHours(0, 0, 0, 0);
 
-  console.log("cron--log---", twentyFourHoursAgo);
-
   try {
     const allUsers = await User.find()
     allUsers.map(async (user)=>{
@@ -927,15 +925,15 @@ io.on("connection", (socket) => {
 
 
       if(findEnded){
-        room_ended.map((el) => {
+       room_ended = room_ended.map((el) => {
           if (el.roomId === info.roomId) {
             if(info.save){
-              el.saveCount += 1;
-              el.endCount += 1;
+              el.saveCount = el.saveCount + 1;
+              el.endCount = el.endCount + 1;
               return el
             }else{
-              el.notSaveCount += 1;
-              el.endCount += 1;
+              el.notSaveCount = el.notSaveCount + 1;
+              el.endCount = el.endCount + 1;
               return el
             }
           }else{
@@ -955,7 +953,7 @@ io.on("connection", (socket) => {
 
       if(info.save){
 
-        console.log("isSvaed------------true------",info);
+        console.log("isSvaed------------true------",{roomId : info.roomId, userId: info.userId});
 
         let messageText = info.language === "am" ? "Նամակագրություն" : info.language === "ru" ? "Переписка" : "Chat";
 			  const createdAt = getCurrentDate();
