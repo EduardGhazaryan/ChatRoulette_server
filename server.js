@@ -843,10 +843,7 @@ io.on("connection", (socket) => {
         }
       )
       
-      socket.removeAllListeners("message");
-      socket.removeAllListeners("image_upload");
-      socket.removeAllListeners("sendVoiceMessage");
-      socket.removeAllListeners("end_chat");
+
 
       
     });
@@ -978,8 +975,15 @@ io.on("connection", (socket) => {
 
       if(findEnd.endCount === 2){
         room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
-        socket.removeAllListeners();
 
+        socket.removeAllListeners("message");
+        socket.removeAllListeners("image_upload");
+        socket.removeAllListeners("sendVoiceMessage");
+        socket.removeAllListeners("end_chat");
+        socket.removeAllListeners("join");
+        socket.removeAllListeners("onFocus");
+        socket.removeAllListeners("onBlur");
+        socket.removeAllListeners("isSaved")
       }
 
       }else{
@@ -1004,7 +1008,14 @@ io.on("connection", (socket) => {
        
       }
 
-      socket.removeAllListeners();
+      socket.removeAllListeners("message");
+      socket.removeAllListeners("image_upload");
+      socket.removeAllListeners("sendVoiceMessage");
+      socket.removeAllListeners("end_chat");
+      socket.removeAllListeners("join");
+      socket.removeAllListeners("onFocus");
+      socket.removeAllListeners("onBlur");
+      socket.removeAllListeners("isSaved")
 
 
 
