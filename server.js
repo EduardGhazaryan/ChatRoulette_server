@@ -601,6 +601,8 @@ io.on("connection", (socket) => {
               socket.to(participantID).emit("end_chat", { message: "Zrucakicy lqec chaty" });
           }
       }
+
+      socket.removeAllListeners();
   });
   
 
@@ -976,6 +978,8 @@ io.on("connection", (socket) => {
 
       if(findEnd.endCount === 2){
         room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
+        socket.removeAllListeners();
+
       }
 
       }else{
@@ -1000,6 +1004,7 @@ io.on("connection", (socket) => {
        
       }
 
+      socket.removeAllListeners();
 
 
 
@@ -1028,6 +1033,7 @@ io.on("connection", (socket) => {
 
 
   });
+  
 });
 
 
