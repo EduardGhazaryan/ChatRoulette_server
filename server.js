@@ -826,10 +826,10 @@ io.on("connection", (socket) => {
       
 
 
-       
-
-
-
+      socket.removeAllListeners("message");
+      socket.removeAllListeners("image_upload");
+      socket.removeAllListeners("sendVoiceMessage");
+      socket.removeAllListeners("end_chat");
  
       intervalUsers.push(
         {
@@ -976,14 +976,6 @@ io.on("connection", (socket) => {
       if(findEnd.endCount === 2){
         room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
 
-        socket.removeAllListeners("message");
-        socket.removeAllListeners("image_upload");
-        socket.removeAllListeners("sendVoiceMessage");
-        socket.removeAllListeners("end_chat");
-        socket.removeAllListeners("join");
-        socket.removeAllListeners("onFocus");
-        socket.removeAllListeners("onBlur");
-        socket.removeAllListeners("isSaved")
       }
 
       }else{
@@ -1008,20 +1000,18 @@ io.on("connection", (socket) => {
        
       }
 
-      socket.removeAllListeners("message");
-      socket.removeAllListeners("image_upload");
-      socket.removeAllListeners("sendVoiceMessage");
-      socket.removeAllListeners("end_chat");
-      socket.removeAllListeners("join");
-      socket.removeAllListeners("onFocus");
-      socket.removeAllListeners("onBlur");
-      socket.removeAllListeners("isSaved")
-
-
-
-
-
-      
+      // socket.removeAllListeners("onFocus");
+      // socket.removeAllListeners("onBlur");
+      // socket.removeAllListeners("isSaved") 
+    
+      socket.off("message");
+      socket.off("image_upload");
+      socket.off("sendVoiceMessage");
+      socket.off("end_chat");
+      socket.off("join");
+      socket.off("onFocus");
+      socket.off("onBlur");
+      socket.off("isSaved") 
     })
 
 
