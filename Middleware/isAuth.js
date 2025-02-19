@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken"
+const jwt = require("jsonwebtoken")
 
 const isAuth = (req,res,next)=>{
     const access_token = req?.headers?.authorization
@@ -23,4 +23,4 @@ const isAuth = (req,res,next)=>{
     }
 }
 
-export default isAuth
+module.exports = isAuth

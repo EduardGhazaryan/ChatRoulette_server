@@ -23,6 +23,7 @@ const UserRouter = require("./Router/UserRouter.js");
 const User = require("./Model/User.js");
 const OnlineUsers = require("./Model/OnlineUsers.js");
 const moment = require('moment-timezone');
+const isAuth = require("./Middleware/isAuth.js")
 
 
 const app = express();
@@ -242,7 +243,7 @@ app.post("/api/getNotif", async(req,res)=>{
 
 const serviceAccount = require("./sms-aba78-firebase-adminsdk-u0tlr-fc63e7f863.json")
 const Chats = require("./Model/Chats.js");
-const { default: isAuth } = require("./Middleware/isAuth.js");
+
 
 
 admin.initializeApp({
