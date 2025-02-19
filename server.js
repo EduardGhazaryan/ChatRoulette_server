@@ -737,6 +737,7 @@ io.on("connection", (socket) => {
         ...message,
         messageID: id,
         messageTime,
+        updatedBonus: findUser.bonus
       });
     });
 

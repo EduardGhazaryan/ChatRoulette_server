@@ -20,14 +20,13 @@ const UserController = {
             
             req.on('close', async () => {
                 console.log('Request closed by the client');
-                clearInterval(interval);  // Clear interval if the request is closed
+                clearInterval(interval);  
     
                 try {
                     const findUser = await OnlineUsers.findOne({ user: id });
                     if (findUser) {
                         findUser.status = "offline";
                         await findUser.save();
-                        // console.log("offline----", findUser);
                     } else {
                         console.log("Invalid ID: User Not Found");
                     }
@@ -67,8 +66,7 @@ const UserController = {
                 res.status(500).send({ message: "Internal Server Error" });
             }
         }
-    },
-    
+    },  
     getUser: async(req,res)=>{
         try {
 
