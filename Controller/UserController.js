@@ -7,7 +7,7 @@ const UserController = {
             const { gender, maxAge, minAge, socketID , isLarge} = req.query;
             const { id } = req.params;
             const language = req.headers["accept-language"] ? req.headers["accept-language"] : null;
-    
+            console.log("searchController", req.query );
             const myMinAge = minAge ? minAge : null;
             const myMaxAge = maxAge ? maxAge : null;
             const myGender = gender ? gender : null;

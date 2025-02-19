@@ -50,8 +50,8 @@ app.get("/document",async(req,res)=>{
   res.render("document")
 })
 app.use("/api/auth", AuthRouter);
-app.use("/api/user", UserRouter);
-app.post("/api/mail", async (req, res) => {
+app.use("/api/user",isAuth ,UserRouter);
+app.post("/api/mail", isAuth ,async (req, res) => {
   try {
     const { from, text } = req.body;
     const language = req.headers["accept-language"];
@@ -242,6 +242,7 @@ app.post("/api/getNotif", async(req,res)=>{
 
 const serviceAccount = require("./sms-aba78-firebase-adminsdk-u0tlr-fc63e7f863.json")
 const Chats = require("./Model/Chats.js");
+const { default: isAuth } = require("./Middleware/isAuth.js");
 
 
 admin.initializeApp({
