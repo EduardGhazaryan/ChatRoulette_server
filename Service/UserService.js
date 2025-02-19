@@ -127,7 +127,7 @@ const UserService = {
                                 if(isLarge){
                                     return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false, isLarge:true}
                                 }else{
-                                    return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами выполняем расширенный поиск", success:false, isLarge:true}
+                                    return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами выполняем расширенный поиск", success:false, isLarge:false}
                                 }
                                 
                             }

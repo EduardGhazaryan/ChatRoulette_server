@@ -40,12 +40,14 @@ const UserController = {
                 interval = setInterval(async () => {
                     if (count === 20) {
                         if (!res.headersSent) {
+                            console.log("interval will be over", { message: data.message, success: data.success , isLarge:data.isLarge});
                             res.status(200).send({ message: data.message, success: data.success , isLarge:data.isLarge});
                         }
                         clearInterval(interval);
                     } else {
                         if (data.success) {
                             if (!res.headersSent) {
+                                console.log("find User in interval", { user: data.user, success: data.success, isLarge:data.isLarge });
                                 res.status(data.status).send({ user: data.user, success: data.success, isLarge:data.isLarge });
                             }
                             clearInterval(interval);
@@ -58,6 +60,7 @@ const UserController = {
                 }, 1000);
             } else {
                 if (!res.headersSent) {
+                    console.log("verjin log", data);
                     res.status(data.status).send({ message: data.message });
                 }
             }
