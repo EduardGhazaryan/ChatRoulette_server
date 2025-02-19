@@ -618,6 +618,7 @@ const UserService = {
                      }else{
                          if(language){
                              if(language ==="am"){
+                                console.log("all is there", {status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false, isLarge : false});
                                  return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false, isLarge : false}
                              }
                              if(language ==="ru"){
