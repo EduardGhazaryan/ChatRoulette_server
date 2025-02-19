@@ -618,7 +618,7 @@ const UserService = {
                      }else{
                          if(language){
                              if(language ==="am"){
-                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false,isLarge:false}
+                                 return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false, isLarge : false}
                              }
                              if(language ==="ru"){
                                  return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false,isLarge:false}

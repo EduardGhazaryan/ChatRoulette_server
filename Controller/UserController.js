@@ -40,8 +40,8 @@ const UserController = {
                 interval = setInterval(async () => {
                     if (count === 20) {
                         if (!res.headersSent) {
-                            console.log("interval will be over", { message: data.message, success: data.success , isLarge:data.isLarge});
-                            res.status(200).send({ message: data.message, success: data.success , isLarge:data.isLarge});
+                            console.log("interval will be over", { message: data.message, success: data.success , isLarge:data.isLarge });
+                            res.status(200).send({ message: data.message, success: data.success , isLarge:data.isLarge ? data.isLarge : false});
                         }
                         clearInterval(interval);
                     } else {
