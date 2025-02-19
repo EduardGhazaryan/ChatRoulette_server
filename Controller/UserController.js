@@ -12,8 +12,9 @@ const UserController = {
             const myMaxAge = maxAge ? maxAge : null;
             const myGender = gender ? gender : null;
             const mySocketID = socketID ? socketID : null;
-    
-            let data = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language,isLarge);
+            let isLargeBool = isLarge === "true"
+    console.log("isLareg controller", isLargeBool);
+            let data = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language,isLargeBool);
             let count = 0;
             let interval;
     
