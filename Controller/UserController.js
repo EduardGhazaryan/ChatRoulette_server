@@ -7,13 +7,11 @@ const UserController = {
             const { gender, maxAge, minAge, socketID , isLarge} = req.query;
             const { id } = req.params;
             const language = req.headers["accept-language"] ? req.headers["accept-language"] : null;
-            console.log("searchController", req.query );
             const myMinAge = minAge ? minAge : null;
             const myMaxAge = maxAge ? maxAge : null;
             const myGender = gender ? gender : null;
             const mySocketID = socketID ? socketID : null;
             let isLargeBool = isLarge === "true"
-    console.log("isLareg controller", isLargeBool);
             let data = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language,isLargeBool);
             let count = 0;
             let interval;
@@ -40,14 +38,12 @@ const UserController = {
                 interval = setInterval(async () => {
                     if (count === 20) {
                         if (!res.headersSent) {
-                            console.log("interval will be over", { message: data.message, success: data.success , isLarge:data.isLarge });
                             res.status(200).send({ message: data.message, success: data.success , isLarge:data.isLarge ? data.isLarge : false});
                         }
                         clearInterval(interval);
                     } else {
                         if (data.success) {
                             if (!res.headersSent) {
-                                console.log("find User in interval", { user: data.user, success: data.success, isLarge:data.isLarge });
                                 res.status(data.status).send({ user: data.user, success: data.success, isLarge:data.isLarge });
                             }
                             clearInterval(interval);
@@ -60,7 +56,6 @@ const UserController = {
                 }, 1000);
             } else {
                 if (!res.headersSent) {
-                    console.log("verjin log", data);
                     res.status(data.status).send({ message: data.message });
                 }
             }
