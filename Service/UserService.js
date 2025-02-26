@@ -23,6 +23,11 @@ const getCurrentDate = () => {
 const UserService = {
     search: async (gender, maxAge, minAge,userId,socketID,language,isLarge)=>{
         let newUser = null
+
+        console.log("first service log -----", {
+            isMaxAge : maxAge? true : false,
+            isMinAge : minAge? true : false,
+        });
        
         if(userId,socketID){
             let findOnline = await OnlineUsers.findOne({user:userId}).populate(['user'])
@@ -63,7 +68,7 @@ const UserService = {
                 
      
              if(onlineUsers.length > 0){
-                
+                console.log("all online users", onlineUsers);
      
                  if(!gender && !maxAge && !minAge){
                      let findUser = onlineUsers.filter((u)=> {
@@ -150,46 +155,38 @@ const UserService = {
                      }
 
                      
-                 }
-                 if(gender && !maxAge && !minAge){
+                 }else if(gender && !maxAge && !minAge){
                      
                      const findUserGender = onlineUsers.filter((u)=> {
                          if(u.searchParams.minAge && u.searchParams.maxAge && u.searchParams.gender){
                              if(u.searchParams.minAge <= user.age && u.searchParams.maxAge >= user.age && u.searchParams.gender === user.gender && gender === u.user.gender){
                                  return u
                              }
-                         }
-                         if(!u.searchParams.minAge && !u.searchParams.maxAge && !u.searchParams.gender){
+                         }else if(!u.searchParams.minAge && !u.searchParams.maxAge && !u.searchParams.gender){
                              if(gender === u.user.gender){
                                  return u
                              }
-                         }
-                         if(u.searchParams.minAge && !u.searchParams.maxAge && !u.searchParams.gender){
+                         }else if(u.searchParams.minAge && !u.searchParams.maxAge && !u.searchParams.gender){
                              if(u.searchParams.minAge <= user.age && gender === u.user.gender){
                                  return u
                              }
-                         }
-                         if(u.searchParams.minAge && u.searchParams.maxAge && !u.searchParams.gender){
+                         }else if(u.searchParams.minAge && u.searchParams.maxAge && !u.searchParams.gender){
                              if(u.searchParams.minAge <= user.age && u.searchParams.maxAge >= user.age && gender === u.user.gender && gender === u.user.gender){
                                  return u
                              }
-                         }
-                         if(u.searchParams.minAge && !u.searchParams.maxAge && u.searchParams.gender){
+                         }else if(u.searchParams.minAge && !u.searchParams.maxAge && u.searchParams.gender){
                              if(u.searchParams.minAge <= user.age && u.searchParams.gender === user.gender && gender === u.user.gender){
                                  return u
                              }
-                         }
-                         if(!u.searchParams.minAge && u.searchParams.maxAge && !u.searchParams.gender){
+                         }else if(!u.searchParams.minAge && u.searchParams.maxAge && !u.searchParams.gender){
                              if(u.searchParams.maxAge >= user.age && gender === u.user.gender){
                                  return u
                              }
-                         }
-                         if(!u.searchParams.minAge && u.searchParams.maxAge && u.searchParams.gender){
+                         }else if(!u.searchParams.minAge && u.searchParams.maxAge && u.searchParams.gender){
                              if(u.searchParams.maxAge >= user.age && u.searchParams.gender === user.gender && gender === u.user.gender){
                                  return u
                              }
-                         }
-                         if(!u.searchParams.minAge && !u.searchParams.maxAge && u.searchParams.gender){
+                         }else if(!u.searchParams.minAge && !u.searchParams.maxAge && u.searchParams.gender){
                              if(u.searchParams.gender === user.gender && gender === u.user.gender){
                                  return u
                              }
@@ -199,7 +196,7 @@ const UserService = {
                      let index = Math.floor(Math.random() * findUserGender.length)
                    
                      console.log("search service----",{
-                        status: 200, user:findUserGender[index], success:true, findUserGender
+                        status: 200, user:findUserGender, success:true, findUserGender
                      });
                      if(findUserGender.length > 0){
                          return {status: 200, user:findUserGender[index], success:true}
@@ -242,8 +239,7 @@ const UserService = {
                      }
                     
                   
-                 }
-                 if(!gender && maxAge && !minAge){
+                 }else if(!gender && maxAge && !minAge){
                 
                      const findUserMax = onlineUsers.filter((u)=> {
                          if(u.searchParams.minAge && u.searchParams.maxAge && u.searchParams.gender){
@@ -309,8 +305,7 @@ const UserService = {
                     
                     
                  
-                 }
-                 if(!gender && !maxAge && minAge){
+                 }else if(!gender && !maxAge && minAge){
            
                      const findUserMin = onlineUsers.filter((u)=>{
                          if(u.searchParams.minAge && u.searchParams.maxAge && u.searchParams.gender){
@@ -375,8 +370,7 @@ const UserService = {
                      }
                    
                     
-                 }
-                 if(gender && maxAge && !minAge){
+                 }else if(gender && maxAge && !minAge){
                      const findUseGenderMax = onlineUsers.filter((u)=> {
                          if(u.searchParams.minAge && u.searchParams.maxAge && u.searchParams.gender){
                              if(u.searchParams.minAge <= user.age && u.searchParams.maxAge >= user.age && u.searchParams.gender === user.gender && gender === u.user.gender && maxAge >= u.user.age){
@@ -440,8 +434,7 @@ const UserService = {
                      }
                  
                 
-                 }
-                 if(gender && !maxAge && minAge){
+                 }else if(gender && !maxAge && minAge){
                      const findUseGenderMin = onlineUsers.filter((u)=> {
                          if(u.searchParams.minAge && u.searchParams.maxAge && u.searchParams.gender){
                              if(u.searchParams.minAge <= user.age && u.searchParams.maxAge >= user.age && u.searchParams.gender === user.gender && gender === u.user.gender && minAge <= u.user.age){
@@ -505,8 +498,7 @@ const UserService = {
                      }
                     
           
-                 }
-                 if(!gender && maxAge && minAge){
+                 }else if(!gender && maxAge && minAge){
                      const findUseMaxMin = onlineUsers.filter((u)=> {
                          if(u.searchParams.minAge && u.searchParams.maxAge && u.searchParams.gender){
                              if(u.searchParams.minAge <= user.age && u.searchParams.maxAge >= user.age && u.searchParams.gender === user.gender && u.user.age <= maxAge && u.user.age >= minAge){
@@ -571,8 +563,7 @@ const UserService = {
                      }
                  
               
-                 }
-                 if(gender && maxAge && minAge){
+                 }else if(gender && maxAge && minAge){
                      const findUseGenderMaxMin = onlineUsers.filter((u)=> {
                          if(u.searchParams.minAge && u.searchParams.maxAge && u.searchParams.gender){
                              if(u.searchParams.minAge <= user.age && u.searchParams.maxAge >= user.age && u.searchParams.gender === user.gender  && u.user.gender === gender && u.user.age <= maxAge && u.user.age >= minAge){

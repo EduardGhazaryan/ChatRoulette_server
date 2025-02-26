@@ -830,7 +830,7 @@ io.on("connection", (socket) => {
 
       
 
-
+      socket.leave(info.roomId)
       socket.removeAllListeners("message");
       socket.removeAllListeners("image_upload");
       socket.removeAllListeners("sendVoiceMessage");
