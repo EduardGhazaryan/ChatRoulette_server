@@ -71,8 +71,8 @@ const UserController = {
             const { gender, socketID } = req.query;
             const { id } = req.params;
             const language = req.headers["accept-language"] ? req.headers["accept-language"] : null;
-
             const mySocketID = socketID ? socketID : null;
+            console.log("largeSearch controller----", {gender, id, mySocketID, language});
             let data = await UserService.search(gender, id, mySocketID, language);
             let count = 0;
             let interval;

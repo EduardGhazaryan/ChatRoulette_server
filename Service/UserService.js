@@ -612,6 +612,8 @@ const UserService = {
     },
     largeSearch: async (gender,userId,socketID,language)=>{
         let newUser = null
+        console.log("largeSearch service----", {gender,userId,socketID,language});
+
        
         if(userId && socketID && gender){
             let findOnline = await OnlineUsers.findOne({user:userId}).populate(['user'])
