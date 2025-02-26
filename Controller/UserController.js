@@ -73,7 +73,7 @@ const UserController = {
             const language = req.headers["accept-language"] ? req.headers["accept-language"] : null;
             const mySocketID = socketID ? socketID : null;
             console.log("largeSearch controller----", {gender, id, mySocketID, language});
-            let data = await UserService.search(gender, id, mySocketID, language);
+            let data = await UserService.largeSearch(gender, id, mySocketID, language);
             let count = 0;
             let interval;
     
@@ -110,7 +110,7 @@ const UserController = {
                             }
                             clearInterval(interval);
                         } else {
-                            let data2 = await UserService.search(gender, id, mySocketID, language);
+                            let data2 = await UserService.largeSearch(gender, id, mySocketID, language);
                             data = data2;
                             count++;
                         }
