@@ -621,6 +621,8 @@ io.on("connection", (socket) => {
         chat.roomMembers.includes(payload.participant)
     );
 
+    console.log("user want to join", socket.id);
+
     if (findChat) {
       roomId = findChat.roomId;
       socket.join(findChat.roomId);
