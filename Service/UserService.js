@@ -610,7 +610,7 @@ const UserService = {
             return {status:400,message: "Bad Request"}
         }
     },
-    largeSearch: async (gender,userId,socketID,language,isLarge)=>{
+    largeSearch: async (gender,userId,socketID,language)=>{
         let newUser = null
        
         if(userId && socketID && gender){
