@@ -48,7 +48,7 @@ const UserController = {
                             }
                             clearInterval(interval);
                         } else {
-                            let data2 = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language,isLarge);
+                            let data2 = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language);
                             data = data2;
                             count++;
                         }
