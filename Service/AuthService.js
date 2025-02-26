@@ -18,7 +18,7 @@ getCurrentDateTime()
 
 
 const AuthService = {
-    signUp: async (gender, age, nickname,socketID,phoneID,language,timezone,firebaseToken) => {
+    signUp: async (gender, age, nickname,socketID,phoneID,language,firebaseToken) => {
        
         if (gender && age && nickname && firebaseToken) {
             const findUser = await User.findOne({ nickname });
@@ -90,7 +90,7 @@ const AuthService = {
             return { status: 400, message: "Bad Request" };
         }
     },
-    signIn : async (nickname,socketID,phoneID,language,timezone,firebaseToken)=>{
+    signIn : async (nickname,socketID,phoneID,language,firebaseToken)=>{
         if(nickname && socketID && phoneID && firebaseToken){
             let findUser = await User.findOne({nickname})
 

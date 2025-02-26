@@ -21,15 +21,10 @@ const getCurrentDate = () => {
   };
 
 const UserService = {
-    search: async (gender, maxAge, minAge,userId,socketID,language,isLarge)=>{
+    search: async (gender, maxAge, minAge,userId,socketID,language)=>{
         let newUser = null
-
-        console.log("first service log -----", {
-            isMaxAge : maxAge? true : false,
-            isMinAge : minAge? true : false,
-        });
        
-        if(userId,socketID){
+        if(userId && socketID){
             let findOnline = await OnlineUsers.findOne({user:userId}).populate(['user'])
 
             if(findOnline){
@@ -68,7 +63,6 @@ const UserService = {
                 
      
              if(onlineUsers.length > 0){
-                console.log("all online users", onlineUsers);
      
                  if(!gender && !maxAge && !minAge){
                      let findUser = onlineUsers.filter((u)=> {
@@ -121,36 +115,19 @@ const UserService = {
                      }else{
                         if(language){
                             if(language ==="am"){
-                                if(isLarge){
-                                    return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false, isLarge:true}
-                                }else{
-                                    return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել կատարվում է ընդլայնված որոնում", success:false, isLarge:false}
-                                }
-                                
+                                    return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել կատարվում է ընդլայնված որոնում", success:false, isLarge:false}   
                             }
                             if(language ==="ru"){
-                                if(isLarge){
-                                    return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false, isLarge:true}
-                                }else{
                                     return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами выполняем расширенный поиск", success:false, isLarge:false}
-                                }
-                                
                             }
                             if(language ==="en"){
-                                if(isLarge){
-                                    return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:true}
-                                }else{
                                     return{status: 200, message: "We didn't find any User With These parameters perform an advanced search", success:false,isLarge: false}
-                                }
-                                
                             }
             
                         }else{
-                            if(isLarge){
-                                return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:true}
-                            }else{
+
                                 return{status: 200, message: "We didn't find any User With These parameters perform an advanced search", success:false,isLarge: false}
-                            }
+                            
                         }
                      }
 
@@ -195,45 +172,23 @@ const UserService = {
 
                      let index = Math.floor(Math.random() * findUserGender.length)
                    
-                     console.log("search service----",{
-                        status: 200, user:findUserGender, success:true, findUserGender
-                     });
                      if(findUserGender.length > 0){
                          return {status: 200, user:findUserGender[index], success:true}
                      }else{
      
                          if(language){
                             if(language ==="am"){
-                                if(isLarge){
-                                    return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false, isLarge:true}
-                                }else{
                                     return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել կատարվում է ընդլայնված որոնում", success:false, isLarge:false}
-                                }
-                                
                             }
                             if(language ==="ru"){
-                                if(isLarge){
-                                    return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false, isLarge:true}
-                                }else{
                                     return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами выполняем расширенный поиск", success:false, isLarge:true}
-                                }
-                                
                             }
                             if(language ==="en"){
-                                if(isLarge){
-                                    return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:true}
-                                }else{
                                     return{status: 200, message: "We didn't find any User With These parameters perform an advanced search", success:false,isLarge: false}
-                                }
-                                
                             }
              
                          }else{
-                            if(isLarge){
-                                return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:true}
-                            }else{
                                 return{status: 200, message: "We didn't find any User With These parameters perform an advanced search", success:false,isLarge: false}
-                            }
                          }
                          
                      }
@@ -636,34 +591,147 @@ const UserService = {
                 
                  if(language){
                      if(language ==="am"){
-                        if(isLarge){
-                            return {status: 200, message: "Տվյալ պահին օնլայն օգտատերեր չկան:", success: false, isLarge:true}
-                        }else{
                             return {status: 200, message: "Տվյալ պահին օնլայն օգտատերեր չկան:", success: false,isLarge:false}
-                        }
                      }
                      if(language ==="ru"){
-                        if(isLarge){
-                            return {status: 200, message: "В настоящее время нет онлайн-пользователей.", success: false,isLarge:true}
-                        }else{
                             return {status: 200, message: "В настоящее время нет онлайн-пользователей.", success: false, isLarge:false}
-                        }
                      }
                      if(language ==="en"){
-                        if(isLarge){
-                            return {status: 200, message: "There are currently no online users", success: false, isLarge:true}
-                        }else{
-                            return {status: 200, message: "There are currently no online users", success: false, isLarge:false}
-                        }
-                         
+                            return {status: 200, message: "There are currently no online users", success: false, isLarge:false} 
                      }
      
                  }else{
-                    if(isLarge){
-                        return {status: 200, message: "There are currently no online users", success: false, isLarge:true}
-                    }else{
                         return {status: 200, message: "There are currently no online users", success: false, isLarge:false}
-                    }
+                    
+                 }
+              
+             }
+        }else{
+            return {status:400,message: "Bad Request"}
+        }
+    },
+    largeSearch: async (gender,userId,socketID,language,isLarge)=>{
+        let newUser = null
+       
+        if(userId && socketID && gender){
+            let findOnline = await OnlineUsers.findOne({user:userId}).populate(['user'])
+
+            if(findOnline){
+                 findOnline.searchParams.gender = gender
+                 findOnline.searchParams.maxAge = null
+                 findOnline.searchParams.minAge = null
+                 findOnline.status = "online"
+                 findOnline.socketID = socketID
+     
+                 await findOnline.save()
+                 newUser = findOnline
+            }else{
+             const newOnlineUser =  new OnlineUsers({
+                 user: userId,
+                 status: "online",
+                 socketID,
+                 searchParams : {
+                     gender                    
+                 }
+     
+             })
+     
+             await newOnlineUser.save()
+             newUser = newOnlineUser
+            }
+     
+             const  allUsers = await OnlineUsers.find({ user: { $ne: userId } }).populate(["user"])
+     
+             const user = await User.findById(userId)
+             
+             const onlineUsers = allUsers.filter((u)=> u.status === "online" && u.user !== userId)
+                
+                
+     
+             if(onlineUsers.length > 0){
+     
+                     
+                     const findUserGender = onlineUsers.filter((u)=> {
+                         if(u.searchParams.minAge && u.searchParams.maxAge && u.searchParams.gender){
+                             if(u.searchParams.minAge <= user.age && u.searchParams.maxAge >= user.age && u.searchParams.gender === user.gender && gender === u.user.gender){
+                                 return u
+                             }
+                         }else if(!u.searchParams.minAge && !u.searchParams.maxAge && !u.searchParams.gender){
+                             if(gender === u.user.gender){
+                                 return u
+                             }
+                         }else if(u.searchParams.minAge && !u.searchParams.maxAge && !u.searchParams.gender){
+                             if(u.searchParams.minAge <= user.age && gender === u.user.gender){
+                                 return u
+                             }
+                         }else if(u.searchParams.minAge && u.searchParams.maxAge && !u.searchParams.gender){
+                             if(u.searchParams.minAge <= user.age && u.searchParams.maxAge >= user.age && gender === u.user.gender && gender === u.user.gender){
+                                 return u
+                             }
+                         }else if(u.searchParams.minAge && !u.searchParams.maxAge && u.searchParams.gender){
+                             if(u.searchParams.minAge <= user.age && u.searchParams.gender === user.gender && gender === u.user.gender){
+                                 return u
+                             }
+                         }else if(!u.searchParams.minAge && u.searchParams.maxAge && !u.searchParams.gender){
+                             if(u.searchParams.maxAge >= user.age && gender === u.user.gender){
+                                 return u
+                             }
+                         }else if(!u.searchParams.minAge && u.searchParams.maxAge && u.searchParams.gender){
+                             if(u.searchParams.maxAge >= user.age && u.searchParams.gender === user.gender && gender === u.user.gender){
+                                 return u
+                             }
+                         }else if(!u.searchParams.minAge && !u.searchParams.maxAge && u.searchParams.gender){
+                             if(u.searchParams.gender === user.gender && gender === u.user.gender){
+                                 return u
+                             }
+                         }
+                     } )
+
+                     let index = Math.floor(Math.random() * findUserGender.length)
+                   
+                     if(findUserGender.length > 0){
+                         return {status: 200, user:findUserGender[index], success:true}
+                     }else{
+     
+                         if(language){
+                            if(language ==="am"){
+                                    return{status: 200, message: "Տվյալ պարամետրերով օգտատեր չի գտնվել", success:false, isLarge:true}
+                            }
+                            if(language ==="ru"){
+                                    return{status: 200, message: "Мы не нашли ни одного пользователя с этими параметрами", success:false, isLarge:true}    
+                            }
+                            if(language ==="en"){
+                                    return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:true}
+                            }
+             
+                         }else{
+                                return{status: 200, message: "We didn't find any User With These parameters", success:false,isLarge:true}
+                         }
+                         
+                     }
+                    
+                  
+                 
+                 
+               
+                     
+                 
+               
+             }else{
+                
+                 if(language){
+                     if(language ==="am"){
+                            return {status: 200, message: "Տվյալ պահին օնլայն օգտատերեր չկան:", success: false, isLarge:true}
+                     }
+                     if(language ==="ru"){
+                            return {status: 200, message: "В настоящее время нет онлайн-пользователей.", success: false,isLarge:true}
+                     }
+                     if(language ==="en"){
+                            return {status: 200, message: "There are currently no online users", success: false, isLarge:true}
+                     }
+     
+                 }else{
+                        return {status: 200, message: "There are currently no online users", success: false, isLarge:true}
                  }
               
              }

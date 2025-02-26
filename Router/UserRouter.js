@@ -8,6 +8,8 @@ UserRouter.get("/notification", UserController.getNotification)
 
 UserRouter.get('/search/:id', UserController.search);
 
+UserRouter.get('/largeSearch/:id', UserController.largeSearch);
+
 UserRouter.get("/:id", UserController.getUser)
 
 UserRouter.get("/getChats/:id", UserController.getUserChat)

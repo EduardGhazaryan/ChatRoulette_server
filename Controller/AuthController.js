@@ -3,10 +3,10 @@ const AuthService = require('../Service/AuthService');
 const AuthController = {
     signUp: async (req, res) => {
         try {
-            const { age, gender, nickname, socketID, phoneID, timezone, firebaseToken } = req.body;
+            const { age, gender, nickname, socketID, phoneID, firebaseToken } = req.body;
             const language =  req.headers["accept-language"] === "am" || req.headers["accept-language"] === "ru" || req.headers["accept-language"] === "en"  ? req.headers["accept-language"] : null
-       
-            const data = await AuthService.signUp(gender, age, nickname,socketID,phoneID,language,timezone,firebaseToken);
+            console.log({gender, age, nickname,socketID,phoneID,language,firebaseToken});
+            const data = await AuthService.signUp(gender, age, nickname,socketID,phoneID,language,firebaseToken);
       
             if (data.status > 300) {
                 res.status(data.status).send({ message: data.message });
@@ -24,11 +24,11 @@ const AuthController = {
     },
     signIn : async(req,res)=>{
         try {
-            const {nickname, socketID,phoneID,timezone,firebaseToken} = req.body
+            const {nickname, socketID,phoneID,firebaseToken} = req.body
 
             const language = req.headers["accept-language"]
 
-            const data = await AuthService.signIn(nickname,socketID,phoneID,language,timezone,firebaseToken)
+            const data = await AuthService.signIn(nickname,socketID,phoneID,language,firebaseToken)
 
             if(data.status !== 201){
                 res.status(data.status).send({ message: data.message });

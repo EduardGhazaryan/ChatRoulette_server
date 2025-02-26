@@ -611,7 +611,7 @@ io.on("connection", (socket) => {
 
   socket.on("join", async (payload) => {
     let roomId = getRandomRoomName();
-    
+    console.log("user want to join", payload);
 
     userName_cookie = payload.socketID;
 
@@ -621,7 +621,7 @@ io.on("connection", (socket) => {
         chat.roomMembers.includes(payload.participant)
     );
 
-    console.log("user want to join", socket.id);
+   
 
     if (findChat) {
       roomId = findChat.roomId;
@@ -830,7 +830,7 @@ io.on("connection", (socket) => {
 
       
 
-      socket.leave(info.roomId)
+
       socket.removeAllListeners("message");
       socket.removeAllListeners("image_upload");
       socket.removeAllListeners("sendVoiceMessage");

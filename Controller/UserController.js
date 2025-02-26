@@ -4,18 +4,14 @@ const UserService = require('../Service/UserService.js');
 const UserController = {
     search: async (req, res) => {
         try {
-            const { gender, maxAge, minAge, socketID , isLarge} = req.query;
+            const { gender, maxAge, minAge, socketID } = req.query;
             const { id } = req.params;
             const language = req.headers["accept-language"] ? req.headers["accept-language"] : null;
             const myMinAge = minAge ? minAge : null;
             const myMaxAge = maxAge ? maxAge : null;
             const myGender = gender ? gender : null;
             const mySocketID = socketID ? socketID : null;
-            let isLargeBool = isLarge === "true"
-            console.log("search controller----",{
-                myGender, myMaxAge, myMinAge, id, mySocketID, language,isLargeBool,minAge,maxAge
-            });
-            let data = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language,isLargeBool);
+            let data = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language);
             let count = 0;
             let interval;
     
@@ -39,7 +35,7 @@ const UserController = {
     
             if (data.status === 200) {
                 interval = setInterval(async () => {
-                    if (count === 20) {
+                    if (count === 10) {
                         console.log("mard chi gtel -----", data);
                         if (!res.headersSent) {
                             res.status(200).send({ message: data.message, success: data.success , isLarge:data.isLarge ? data.isLarge : false});
@@ -53,6 +49,68 @@ const UserController = {
                             clearInterval(interval);
                         } else {
                             let data2 = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language,isLarge);
+                            data = data2;
+                            count++;
+                        }
+                    }
+                }, 1000);
+            } else {
+                if (!res.headersSent) {
+                    res.status(data.status).send({ message: data.message });
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            if (!res.headersSent) {
+                res.status(500).send({ message: "Internal Server Error" });
+            }
+        }
+    },  
+    largeSearch: async (req, res) => {
+        try {
+            const { gender, socketID } = req.query;
+            const { id } = req.params;
+            const language = req.headers["accept-language"] ? req.headers["accept-language"] : null;
+
+            const mySocketID = socketID ? socketID : null;
+            let data = await UserService.search(gender, id, mySocketID, language);
+            let count = 0;
+            let interval;
+    
+            
+            req.on('close', async () => {
+                console.log('Request closed by the client');
+                clearInterval(interval);  
+    
+                try {
+                    const findUser = await OnlineUsers.findOne({ user: id });
+                    if (findUser) {
+                        findUser.status = "offline";
+                        await findUser.save();
+                    } else {
+                        console.log("Invalid ID: User Not Found");
+                    }
+                } catch (error) {
+                    console.error("Error updating user status:", error);
+                }
+            });
+    
+            if (data.status === 200) {
+                interval = setInterval(async () => {
+                    if (count === 10) {
+                        console.log("mard chi gtel -----", data);
+                        if (!res.headersSent) {
+                            res.status(200).send({ message: data.message, success: data.success , isLarge:data.isLarge ? data.isLarge : false});
+                        }
+                        clearInterval(interval);
+                    } else {
+                        if (data.success) {
+                            if (!res.headersSent) {
+                                res.status(data.status).send({ user: data.user, success: data.success, isLarge:data.isLarge });
+                            }
+                            clearInterval(interval);
+                        } else {
+                            let data2 = await UserService.search(gender, id, mySocketID, language);
                             data = data2;
                             count++;
                         }
