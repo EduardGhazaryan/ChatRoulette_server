@@ -13,7 +13,7 @@ const UserController = {
             const mySocketID = socketID ? socketID : null;
             let isLargeBool = isLarge === "true"
             console.log("search controller----",{
-                myGender, myMaxAge, myMinAge, id, mySocketID, language,isLargeBool
+                myGender, myMaxAge, myMinAge, id, mySocketID, language,isLargeBool,minAge,maxAge
             });
             let data = await UserService.search(myGender, myMaxAge, myMinAge, id, mySocketID, language,isLargeBool);
             let count = 0;
@@ -40,6 +40,7 @@ const UserController = {
             if (data.status === 200) {
                 interval = setInterval(async () => {
                     if (count === 20) {
+                        console.log("mard chi gtel -----", data);
                         if (!res.headersSent) {
                             res.status(200).send({ message: data.message, success: data.success , isLarge:data.isLarge ? data.isLarge : false});
                         }
