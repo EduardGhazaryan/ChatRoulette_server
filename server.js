@@ -1002,10 +1002,6 @@ io.on("connection", (socket) => {
 
        
       }
-
-      // socket.removeAllListeners("onFocus");
-      // socket.removeAllListeners("onBlur");
-      // socket.removeAllListeners("isSaved") 
     
       socket.removeAllListeners("message");
       socket.removeAllListeners("image_upload");

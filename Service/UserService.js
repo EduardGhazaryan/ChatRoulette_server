@@ -198,6 +198,9 @@ const UserService = {
 
                      let index = Math.floor(Math.random() * findUserGender.length)
                    
+                     console.log("search service----",{
+                        status: 200, user:findUserGender[index], success:true
+                     });
                      if(findUserGender.length > 0){
                          return {status: 200, user:findUserGender[index], success:true}
                      }else{
