@@ -1033,6 +1033,10 @@ io.on("connection", (socket) => {
       socket.to(participant).emit("onTyping", { isTyping: false});
     })
 
+    socket.on("test",(data)=>{
+      console.log("test socket is worked",socket.id);
+    })
+
 
   });
   
