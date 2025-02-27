@@ -679,7 +679,7 @@ io.on("connection", (socket) => {
       });
 
       io.to(payload.participant).emit("participant", {
-        participant : payload.participant
+        participant : payload.socketID
       })
 
       const findOnlineUser = await OnlineUsers.findOne({
