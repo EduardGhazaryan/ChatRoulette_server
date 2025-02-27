@@ -678,6 +678,10 @@ io.on("connection", (socket) => {
         all_users: newRoomConnect,
       });
 
+      io.to(payload.participant).emit("participant", {
+        participant : payload.participant
+      })
+
       const findOnlineUser = await OnlineUsers.findOne({
         user: payload.userId,
       });
@@ -831,10 +835,10 @@ io.on("connection", (socket) => {
       
 
 
-      // socket.removeAllListeners("message");
-      // socket.removeAllListeners("image_upload");
-      // socket.removeAllListeners("sendVoiceMessage");
-      // socket.removeAllListeners("end_chat");
+      socket.removeAllListeners("message");
+      socket.removeAllListeners("image_upload");
+      socket.removeAllListeners("sendVoiceMessage");
+      socket.removeAllListeners("end_chat");
  
       intervalUsers.push(
         {
@@ -1005,14 +1009,14 @@ io.on("connection", (socket) => {
        
       }
     
-      // socket.removeAllListeners("message");
-      // socket.removeAllListeners("image_upload");
-      // socket.removeAllListeners("sendVoiceMessage");
-      // socket.removeAllListeners("end_chat");
-      // socket.removeAllListeners("join");
-      // socket.removeAllListeners("onFocus");
-      // socket.removeAllListeners("onBlur");
-      // socket.removeAllListeners("isSaved") 
+      socket.removeAllListeners("message");
+      socket.removeAllListeners("image_upload");
+      socket.removeAllListeners("sendVoiceMessage");
+      socket.removeAllListeners("end_chat");
+      socket.removeAllListeners("join");
+      socket.removeAllListeners("onFocus");
+      socket.removeAllListeners("onBlur");
+      socket.removeAllListeners("isSaved") 
     })
 
 
