@@ -1009,6 +1009,7 @@ io.on("connection", (socket) => {
        
       }
     
+      socket.off("join")
       socket.off("image_upload")
       socket.off("message")
       socket.off("sendVoiceMessage")
