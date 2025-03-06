@@ -1009,6 +1009,14 @@ io.on("connection", (socket) => {
        
       }
     
+      socket.off("image_upload")
+      socket.off("message")
+      socket.off("sendVoiceMessage")
+      socket.off("end_chat")
+      socket.off("onFocus")
+      socket.off("onBlur")
+      socket.off("isSaved")
+      socket.off("testt")
       // socket.removeAllListeners("message");
       // socket.removeAllListeners("image_upload");
       // socket.removeAllListeners("sendVoiceMessage");
