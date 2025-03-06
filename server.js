@@ -686,373 +686,378 @@ io.on("connection", (socket) => {
 
 
 
-    socket.on("message", async (message) => {
-      console.log("new-message----", message);
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, "0");
-      const minutes = now.getMinutes().toString().padStart(2, "0");
-      const seconds = now.getSeconds().toString().padStart(2, "0");
-      let messageTime = `${hours}:${minutes}:${seconds}`;
 
-      let findRoom = newRoomConnect.find((r) => r.roomId === message.roomId);
-      let findBySocketID = findRoom.roomMembers.find(
-        (id) => id !== message.from
-      );
-      const findUser = await User.findOne({ socketID: findBySocketID });
-
-      let findUserCount = userCount.find(
-        (r) => r.roomId === message.roomId && r.socketID === findBySocketID
-      );
-
-      if (findUserCount) {
-        if (findUserCount.chatBonus < 20) {
-          userCount.map((r) => {
-            if (r.roomId === message.roomId && r.socketID === findBySocketID) {
-              r.chatBonus = r.chatBonus + 1;
-              return r
-            }else{
-              return r
-            }
-          });
-          findUser.bonus = findUser.bonus + 1;
-
-          await findUser.save();
-        }
-      } else {
-        userCount.push({
-          socketID: findBySocketID,
-          roomId: message.roomId,
-          chatBonus: 1,
-        });
-        findUser.bonus = findUser.bonus + 1;
-        await findUser.save();
-      }
-
-      let id = generateUniqueId();
-      console.log("gnacox message-----");
-      if(findUser && message.content){
-        sendMessageNotification(findUser,message.content)
-      }
-      io.to(roomId).emit("createMessage", {
-        ...message,
-        messageID: id,
-        messageTime,
-        updatedBonus: findUser.bonus
-      });
-    });
-
-    socket.on("image_upload", (data) => {
-      const buffer = Buffer.from(data.image, "base64");
-      console.log("image----", data);
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, "0");
-      const minutes = now.getMinutes().toString().padStart(2, "0");
-      const seconds = now.getSeconds().toString().padStart(2, "0");
-      let messageTime = `${hours}:${minutes}:${seconds}`;
-
-      const imageSizeInBytes = Buffer.byteLength(buffer);
-  
-
-  const imageSizeInMB = (imageSizeInBytes / (1024 * 1024)).toFixed(2);
-
-  console.log(`Image size: ${imageSizeInMB} MB`);
-  console.log(`Image size: ${imageSizeInBytes} MB`);
-
-      let id = generateUniqueId();
-
-	  const folderPath = path.join(__dirname, "uploads", roomId);
-      const fileName = `${Date.now()}.jpg`;
-      const filePath = path.join(folderPath, fileName);
-
-	  if (!fs.existsSync(folderPath)) {
-		fs.mkdirSync(folderPath, { recursive: true });
-	  }
-
-      fs.writeFile(filePath, buffer, (err) => {
-        if (err) {
-          console.error(err);
-        } else {
-        }
-      });
-      const imageUrl = `uploads/${roomId}/${fileName}`;
-
-      io.to(roomId).emit("receive_image", {
-        imageUrl,
-        userId: data.userId,
-        socketID: data.socketID,
-        messageTime,
-        messageID: id,
-      });
-    });
-
-    
-    socket.on("end_chat", async (info) => {
-      let findRoom = newRoomConnect?.find((r) => r.roomId === info.roomId);
-      let participantID = findRoom?.roomMembers?.find(
-        (u) => u !== info.socketID
-      );
-
-      console.log("end_chat--is worked--------",{roomId: info.roomId, user: info.socketID,findRoom,participantID});
-      
-      const findOnlineUser = await OnlineUsers.findOne({ user: info.userId });
-
-      if (findOnlineUser) {
-        findOnlineUser.status = "offline";
-        await findOnlineUser.save();
-      }
-
-      userCount = userCount.filter(
-        (u) => u.roomId !== info.roomId && u.socketID !== info.socketID
-      );
-      newRoomConnect.map((r)=>{
-        if(r.roomId === info.roomId){
-          r.endCount  = r.endCount + 1
-          return r
-        }else{
-          return r
-        }
-      })
-      if(findRoom && findRoom.endCount === 1){
-        
-        socket
-        .to(participantID)
-        .emit("end_chat", { message: "Zrucakicy lqec chaty" });
-        console.log("newRoomConnect---------changed--------",newRoomConnect);
-      }
-     
-      if(findRoom.endCount > 1){
-        newRoomConnect = newRoomConnect.filter((r) => r.roomId !== info.roomId);
-      }
-
-      
-
-
-      // socket.removeAllListeners("message");
-      // socket.removeAllListeners("image_upload");
-      // socket.removeAllListeners("sendVoiceMessage");
-      // socket.removeAllListeners("end_chat");
- 
-      intervalUsers.push(
-        {
-          userId : info.userId, 
-          roomId: info.roomId, 
-          interval: setTimeout(() => {
-            console.log("will-work-timeout---------", info.socketID);
-            io.to(info.socketID).emit("closetime",{message:`Pahne Ekel ${info.socketID}-----${info.userId}`})
-            
-          }, 20000) 
-        }
-      )
-      
-
-
-      
-    });
-
- 
-    socket.on("sendVoiceMessage", (data) => {
-      const voiceBlob = Buffer.from(new Uint8Array(data.voiceBlob));
-   
-      const now = new Date();
-      const hours = now.getHours().toString().padStart(2, "0");
-      const minutes = now.getMinutes().toString().padStart(2, "0");
-      const seconds = now.getSeconds().toString().padStart(2, "0");
-      let messageTime = `${hours}:${minutes}:${seconds}`;
-   
-      let id = generateUniqueId();
-   
-      const folderPath = path.join(__dirname, "uploads", data.roomId);
-      const originalFilename = `${uuidv4()}.webm`;
-      const originalFilePath = path.join(folderPath, originalFilename);
-      const convertedFilename = `${uuidv4()}.aac`;
-      const convertedFilePath = path.join(folderPath, convertedFilename);
-   
-      if (!fs.existsSync(folderPath)) {
-         fs.mkdirSync(folderPath, { recursive: true });
-      }
-   
-      // Save the WebM file temporarily
-      fs.writeFile(originalFilePath, voiceBlob, (err) => {
-         if (err) {
-            console.error("Error saving voice message:", err);
-            return;
-         }
-   
-         // Convert WebM to AAC format
-         ffmpeg(originalFilePath)
-   .toFormat('mp3')
-   .on('error', (err) => {
-      console.error('Error converting voice message:', err);
-   })
-   .on('end', () => {
-      // Broadcast the converted file path to other users in the room
-      io.to(data.roomId).emit("receiveVoiceMessage", {
-         socketID: data.socketID,
-         userId: data.userId,
-         voiceUrl: `uploads/${data.roomId}/${convertedFilename}`,
-         messageID: id,
-         messageTime,
-      });
-      
-      fs.unlink(originalFilePath, (err) => {
-         if (err) console.error('Error deleting WebM file:', err);
-      });
-   })
-   .save(convertedFilePath);
-
-      });
-   });
-
-    socket.on("isSaved",async (info)=>{
-      let findEnded = room_ended.find((r) => r.roomId === info.roomId);
-      console.log("isSaved-------",info);
-      intervalUsers.map((u)=>{
-        if(u.userId === info.userId && u.roomId === info.roomId){
-          clearTimeout(u.interval)
-          return u
-        }else{
-          return u
-        }
-      })
-
-      console.log("intervalUsers---------",intervalUsers);
-      intervalUsers = intervalUsers.filter((u)=> u.userId !== info.userId )
-      console.log("intervalUsers---------delete------",intervalUsers);
-
-      const user = await User.findById(info.userId);
-
-
-
-
-      if(findEnded){
-       room_ended = room_ended.map((el) => {
-          if (el.roomId === info.roomId) {
-            if(info.save){
-              el.saveCount = el.saveCount + 1;
-              el.endCount = el.endCount + 1;
-              return el
-            }else{
-              el.notSaveCount = el.notSaveCount + 1;
-              el.endCount = el.endCount + 1;
-              return el
-            }
-          }else{
-            return el
-          }
-        });
-      }else{
-        room_ended.push({
-          roomId: info.roomId,
-          endCount: 1,
-          saveCount: info.save ? 1 : 0,
-          notSaveCount: info.save ? 0 : 1,
-        });
-
-      }
-
-
-      if(info.save){
-
-        console.log("isSvaed------------true------",{roomId : info.roomId, userId: info.userId});
-
-        let messageText = info.language === "am" ? "Նամակագրություն" : info.language === "ru" ? "Переписка" : "Chat";
-			  const createdAt = getCurrentDate();
-			  const newChat = new Chats({
-			      userId : info.userId,
-			      roomId: info.roomId,
-			      participantId : info.participantId,
-			      createdAt,
-			      chatName: `${messageText}/${createdAt}`,
-			      chat: info.chat
-			  });
-	
-			await newChat.save();
-	
-    
-			user.chats = [...user.chats, newChat._id];
-			await user.save();
-
-      let findEnd = room_ended.find((r) => r.roomId === info.roomId);
-
-      if(findEnd.endCount === 2){
-        room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
-
-      }
-
-      }else{
-        let findEnd = room_ended.find((r) => r.roomId === info.roomId);
-
-        if(findEnd && findEnd.endCount === 2){
-          if(findEnd.notSaveCount === 2){
-          
-            fs.rm(`uploads/${findEnd.roomId}`, { recursive: true, force: true }, (err) => {
-              if (err) {
-                console.error("Error deleting the folder:", err);
-                return;
-              }
-              console.log("Folder successfully deleted.");
-            });
-           
-          }
-
-          room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
-        }
-
-       
-      }
-    
-      socket.off("join")
-      socket.off("room_joined")
-      socket.off("room_created")
-      socket.off("me")
-      socket.off("image_upload")
-      socket.off("message")
-      socket.off("sendVoiceMessage")
-      socket.off("end_chat")
-      socket.off("onFocus")
-      socket.off("onBlur")
-      socket.off("isSaved")
-      socket.off("testt")
-      socket.off("participant")
-      socket.off("createMessage")
-      socket.off("receive_image")
-      socket.off("closetime")
-      socket.off("receiveVoiceMessage")
-      
-      // socket.removeAllListeners("message");
-      // socket.removeAllListeners("image_upload");
-      // socket.removeAllListeners("sendVoiceMessage");
-      // socket.removeAllListeners("end_chat");
-      // socket.removeAllListeners("join");
-      // socket.removeAllListeners("onFocus");
-      // socket.removeAllListeners("onBlur");
-      // socket.removeAllListeners("isSaved") 
-    })
-
-
-    socket.on("onFocus", (data) => {
-      const findRoom = newRoomConnect.find(r=> r.roomId === data.roomId)
-	    const participant = findRoom?.roomMembers?.find(r=> r !== data.socketID)
-      console.log("onFocus----participant", participant);
-      console.log("onFocus----data.socketID", data.socketID);
-      socket.to(participant).emit("onTyping", { isTyping: true});
-
-    })
-
-    socket.on("onBlur", (data) => {
-      const findRoom = newRoomConnect.find(r=> r.roomId === data.roomId)
-      const participant = findRoom?.roomMembers?.find(r=> r !== data.socketID)
-      console.log("onBlur----participant", participant);
-      console.log("onBlur----data.socketID", data.socketID);
-      socket.to(participant).emit("onTyping", { isTyping: false});
-    })
-
-    socket.on("testt",(data)=>{
-      console.log("test socket is worked",socket.id);
-    })
 
 
   });
+
+
+
+
+  socket.on("message", async (message) => {
+    console.log("new-message----", message);
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, "0");
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const seconds = now.getSeconds().toString().padStart(2, "0");
+    let messageTime = `${hours}:${minutes}:${seconds}`;
+
+    let findRoom = newRoomConnect.find((r) => r.roomId === message.roomId);
+    let findBySocketID = findRoom.roomMembers.find(
+      (id) => id !== message.from
+    );
+    const findUser = await User.findOne({ socketID: findBySocketID });
+
+    let findUserCount = userCount.find(
+      (r) => r.roomId === message.roomId && r.socketID === findBySocketID
+    );
+
+    if (findUserCount) {
+      if (findUserCount.chatBonus < 20) {
+        userCount.map((r) => {
+          if (r.roomId === message.roomId && r.socketID === findBySocketID) {
+            r.chatBonus = r.chatBonus + 1;
+            return r
+          }else{
+            return r
+          }
+        });
+        findUser.bonus = findUser.bonus + 1;
+
+        await findUser.save();
+      }
+    } else {
+      userCount.push({
+        socketID: findBySocketID,
+        roomId: message.roomId,
+        chatBonus: 1,
+      });
+      findUser.bonus = findUser.bonus + 1;
+      await findUser.save();
+    }
+
+    let id = generateUniqueId();
+    console.log("gnacox message-----");
+    if(findUser && message.content){
+      sendMessageNotification(findUser,message.content)
+    }
+    io.to(roomId).emit("createMessage", {
+      ...message,
+      messageID: id,
+      messageTime,
+      updatedBonus: findUser.bonus
+    });
+  });
+
+  socket.on("image_upload", (data) => {
+    const buffer = Buffer.from(data.image, "base64");
+    console.log("image----", data);
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, "0");
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const seconds = now.getSeconds().toString().padStart(2, "0");
+    let messageTime = `${hours}:${minutes}:${seconds}`;
+
+    const imageSizeInBytes = Buffer.byteLength(buffer);
+
+
+const imageSizeInMB = (imageSizeInBytes / (1024 * 1024)).toFixed(2);
+
+console.log(`Image size: ${imageSizeInMB} MB`);
+console.log(`Image size: ${imageSizeInBytes} MB`);
+
+    let id = generateUniqueId();
+
+  const folderPath = path.join(__dirname, "uploads", roomId);
+    const fileName = `${Date.now()}.jpg`;
+    const filePath = path.join(folderPath, fileName);
+
+  if (!fs.existsSync(folderPath)) {
+  fs.mkdirSync(folderPath, { recursive: true });
+  }
+
+    fs.writeFile(filePath, buffer, (err) => {
+      if (err) {
+        console.error(err);
+      } else {
+      }
+    });
+    const imageUrl = `uploads/${roomId}/${fileName}`;
+
+    io.to(roomId).emit("receive_image", {
+      imageUrl,
+      userId: data.userId,
+      socketID: data.socketID,
+      messageTime,
+      messageID: id,
+    });
+  });
+
+  
+  socket.on("end_chat", async (info) => {
+    let findRoom = newRoomConnect?.find((r) => r.roomId === info.roomId);
+    let participantID = findRoom?.roomMembers?.find(
+      (u) => u !== info.socketID
+    );
+
+    console.log("end_chat--is worked--------",{roomId: info.roomId, user: info.socketID,findRoom,participantID});
+    
+    const findOnlineUser = await OnlineUsers.findOne({ user: info.userId });
+
+    if (findOnlineUser) {
+      findOnlineUser.status = "offline";
+      await findOnlineUser.save();
+    }
+
+    userCount = userCount.filter(
+      (u) => u.roomId !== info.roomId && u.socketID !== info.socketID
+    );
+    newRoomConnect.map((r)=>{
+      if(r.roomId === info.roomId){
+        r.endCount  = r.endCount + 1
+        return r
+      }else{
+        return r
+      }
+    })
+    if(findRoom && findRoom.endCount === 1){
+      
+      socket
+      .to(participantID)
+      .emit("end_chat", { message: "Zrucakicy lqec chaty" });
+      console.log("newRoomConnect---------changed--------",newRoomConnect);
+    }
+   
+    if(findRoom.endCount > 1){
+      newRoomConnect = newRoomConnect.filter((r) => r.roomId !== info.roomId);
+    }
+
+    
+
+
+    // socket.removeAllListeners("message");
+    // socket.removeAllListeners("image_upload");
+    // socket.removeAllListeners("sendVoiceMessage");
+    // socket.removeAllListeners("end_chat");
+
+    intervalUsers.push(
+      {
+        userId : info.userId, 
+        roomId: info.roomId, 
+        interval: setTimeout(() => {
+          console.log("will-work-timeout---------", info.socketID);
+          io.to(info.socketID).emit("closetime",{message:`Pahne Ekel ${info.socketID}-----${info.userId}`})
+          
+        }, 20000) 
+      }
+    )
+    
+
+
+    
+  });
+
+
+  socket.on("sendVoiceMessage", (data) => {
+    const voiceBlob = Buffer.from(new Uint8Array(data.voiceBlob));
+ 
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, "0");
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const seconds = now.getSeconds().toString().padStart(2, "0");
+    let messageTime = `${hours}:${minutes}:${seconds}`;
+ 
+    let id = generateUniqueId();
+ 
+    const folderPath = path.join(__dirname, "uploads", data.roomId);
+    const originalFilename = `${uuidv4()}.webm`;
+    const originalFilePath = path.join(folderPath, originalFilename);
+    const convertedFilename = `${uuidv4()}.aac`;
+    const convertedFilePath = path.join(folderPath, convertedFilename);
+ 
+    if (!fs.existsSync(folderPath)) {
+       fs.mkdirSync(folderPath, { recursive: true });
+    }
+ 
+    // Save the WebM file temporarily
+    fs.writeFile(originalFilePath, voiceBlob, (err) => {
+       if (err) {
+          console.error("Error saving voice message:", err);
+          return;
+       }
+ 
+       // Convert WebM to AAC format
+       ffmpeg(originalFilePath)
+ .toFormat('mp3')
+ .on('error', (err) => {
+    console.error('Error converting voice message:', err);
+ })
+ .on('end', () => {
+    // Broadcast the converted file path to other users in the room
+    io.to(data.roomId).emit("receiveVoiceMessage", {
+       socketID: data.socketID,
+       userId: data.userId,
+       voiceUrl: `uploads/${data.roomId}/${convertedFilename}`,
+       messageID: id,
+       messageTime,
+    });
+    
+    fs.unlink(originalFilePath, (err) => {
+       if (err) console.error('Error deleting WebM file:', err);
+    });
+ })
+ .save(convertedFilePath);
+
+    });
+ });
+
+  socket.on("isSaved",async (info)=>{
+    let findEnded = room_ended.find((r) => r.roomId === info.roomId);
+    console.log("isSaved-------",info);
+    intervalUsers.map((u)=>{
+      if(u.userId === info.userId && u.roomId === info.roomId){
+        clearTimeout(u.interval)
+        return u
+      }else{
+        return u
+      }
+    })
+
+    console.log("intervalUsers---------",intervalUsers);
+    intervalUsers = intervalUsers.filter((u)=> u.userId !== info.userId )
+    console.log("intervalUsers---------delete------",intervalUsers);
+
+    const user = await User.findById(info.userId);
+
+
+
+
+    if(findEnded){
+     room_ended = room_ended.map((el) => {
+        if (el.roomId === info.roomId) {
+          if(info.save){
+            el.saveCount = el.saveCount + 1;
+            el.endCount = el.endCount + 1;
+            return el
+          }else{
+            el.notSaveCount = el.notSaveCount + 1;
+            el.endCount = el.endCount + 1;
+            return el
+          }
+        }else{
+          return el
+        }
+      });
+    }else{
+      room_ended.push({
+        roomId: info.roomId,
+        endCount: 1,
+        saveCount: info.save ? 1 : 0,
+        notSaveCount: info.save ? 0 : 1,
+      });
+
+    }
+
+
+    if(info.save){
+
+      console.log("isSvaed------------true------",{roomId : info.roomId, userId: info.userId});
+
+      let messageText = info.language === "am" ? "Նամակագրություն" : info.language === "ru" ? "Переписка" : "Chat";
+      const createdAt = getCurrentDate();
+      const newChat = new Chats({
+          userId : info.userId,
+          roomId: info.roomId,
+          participantId : info.participantId,
+          createdAt,
+          chatName: `${messageText}/${createdAt}`,
+          chat: info.chat
+      });
+
+    await newChat.save();
+
+  
+    user.chats = [...user.chats, newChat._id];
+    await user.save();
+
+    let findEnd = room_ended.find((r) => r.roomId === info.roomId);
+
+    if(findEnd.endCount === 2){
+      room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
+
+    }
+
+    }else{
+      let findEnd = room_ended.find((r) => r.roomId === info.roomId);
+
+      if(findEnd && findEnd.endCount === 2){
+        if(findEnd.notSaveCount === 2){
+        
+          fs.rm(`uploads/${findEnd.roomId}`, { recursive: true, force: true }, (err) => {
+            if (err) {
+              console.error("Error deleting the folder:", err);
+              return;
+            }
+            console.log("Folder successfully deleted.");
+          });
+         
+        }
+
+        room_ended = room_ended.filter((r) => r.roomId !== info.roomId);
+      }
+
+     
+    }
+  
+    socket.off("join")
+    socket.off("room_joined")
+    socket.off("room_created")
+    socket.off("me")
+    socket.off("image_upload")
+    socket.off("message")
+    socket.off("sendVoiceMessage")
+    socket.off("end_chat")
+    socket.off("onFocus")
+    socket.off("onBlur")
+    socket.off("isSaved")
+    socket.off("testt")
+    socket.off("participant")
+    socket.off("createMessage")
+    socket.off("receive_image")
+    socket.off("closetime")
+    socket.off("receiveVoiceMessage")
+    
+    // socket.removeAllListeners("message");
+    // socket.removeAllListeners("image_upload");
+    // socket.removeAllListeners("sendVoiceMessage");
+    // socket.removeAllListeners("end_chat");
+    // socket.removeAllListeners("join");
+    // socket.removeAllListeners("onFocus");
+    // socket.removeAllListeners("onBlur");
+    // socket.removeAllListeners("isSaved") 
+  })
+
+
+  socket.on("onFocus", (data) => {
+    const findRoom = newRoomConnect.find(r=> r.roomId === data.roomId)
+    const participant = findRoom?.roomMembers?.find(r=> r !== data.socketID)
+    console.log("onFocus----participant", participant);
+    console.log("onFocus----data.socketID", data.socketID);
+    socket.to(participant).emit("onTyping", { isTyping: true});
+
+  })
+
+  socket.on("onBlur", (data) => {
+    const findRoom = newRoomConnect.find(r=> r.roomId === data.roomId)
+    const participant = findRoom?.roomMembers?.find(r=> r !== data.socketID)
+    console.log("onBlur----participant", participant);
+    console.log("onBlur----data.socketID", data.socketID);
+    socket.to(participant).emit("onTyping", { isTyping: false});
+  })
+
+  socket.on("testt",(data)=>{
+    console.log("test socket is worked",socket.id);
+  })
   
 });
 
