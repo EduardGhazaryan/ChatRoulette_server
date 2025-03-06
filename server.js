@@ -520,6 +520,10 @@ io.on("connection", (socket) => {
   if (!users[socket.id]) {
     users[socket.id] = socket.id;
   }
+  let roomId 
+
+  let findChat 
+  let findOnlineUser
 
   let intervalUsers = []
   socket.emit("me", socket.id);
@@ -602,12 +606,12 @@ io.on("connection", (socket) => {
 
 
   socket.on("join", async (payload) => {
-    let roomId = getRandomRoomName();
+    roomId = getRandomRoomName();
     console.log("user want to join", payload);
 
     userName_cookie = payload.socketID;
 
-    const findChat = newRoomConnect.find(
+    findChat = newRoomConnect.find(
       (chat) =>
         chat.roomMembers.includes(payload.socketID) &&
         chat.roomMembers.includes(payload.participant)
@@ -628,7 +632,7 @@ io.on("connection", (socket) => {
         participant: payload.participant,
       });
 
-      const findOnlineUser = await OnlineUsers.findOne({
+       findOnlineUser = await OnlineUsers.findOne({
         user: payload.userId,
       });
 
