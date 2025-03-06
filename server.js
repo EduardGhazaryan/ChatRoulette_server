@@ -745,7 +745,7 @@ io.on("connection", (socket) => {
     if(findUser && message.content){
       sendMessageNotification(findUser,message.content)
     }
-    io.to(roomId).emit("createMessage", {
+    io.to(message.roomId).emit("createMessage", {
       ...message,
       messageID: id,
       messageTime,
