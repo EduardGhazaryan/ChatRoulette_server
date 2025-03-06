@@ -524,14 +524,6 @@ io.on("connection", (socket) => {
   let intervalUsers = []
   socket.emit("me", socket.id);
 
-  socket.on("callUser", (data) => {
-    io.to(data.userToCall).emit("hey", {
-      from: data.from,
-      roomId: data.roomId,
-    });
-  });
-  
-
 
   socket.on("disconnect", async () => {
       console.log("socket was disconnected--------", socket.id);
@@ -1010,6 +1002,9 @@ io.on("connection", (socket) => {
       }
     
       socket.off("join")
+      socket.off("room_joined")
+      socket.off("room_created")
+      socket.off("me")
       socket.off("image_upload")
       socket.off("message")
       socket.off("sendVoiceMessage")
@@ -1018,6 +1013,12 @@ io.on("connection", (socket) => {
       socket.off("onBlur")
       socket.off("isSaved")
       socket.off("testt")
+      socket.off("participant")
+      socket.off("createMessage")
+      socket.off("receive_image")
+      socket.off("closetime")
+      socket.off("receiveVoiceMessage")
+      
       // socket.removeAllListeners("message");
       // socket.removeAllListeners("image_upload");
       // socket.removeAllListeners("sendVoiceMessage");
