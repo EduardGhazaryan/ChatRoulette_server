@@ -56,6 +56,7 @@ const UserService = {
      
              const  allUsers = await OnlineUsers.find({ user: { $ne: userId } }).populate(["user"])
      
+             console.log("all Users -search--", allUsers);
              const user = await User.findById(userId)
              
              const onlineUsers = allUsers.filter((u)=> u.status === "online" && u.user !== userId)
