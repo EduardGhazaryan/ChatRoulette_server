@@ -240,6 +240,11 @@ app.post("/api/getNotif", async(req,res)=>{
   }
 })
 
+app.get("/test", async (req, res) => {
+  console.log("my code");
+  res.send("test");
+});
+
 
 const serviceAccount = require("./sms-aba78-firebase-adminsdk-u0tlr-fc63e7f863.json")
 const Chats = require("./Model/Chats.js");
@@ -510,103 +515,22 @@ const io = require("socket.io")(server, {
   pingTimeout: 60000,
   cors: {
     origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST","PUT","DELETE"],
   },
   maxHttpBufferSize: 1e7
 });
-console.log("1");
-
-io.on("connection", (socket) => {
-  if (!users[socket.id]) {
-    users[socket.id] = socket.id;
-  }
-  let roomId 
-
-  let findChat 
-  let findOnlineUser
-
-  let intervalUsers = []
-  socket.emit("me", socket.id);
 
 
-  socket.on("disconnect", async () => {
-      console.log("socket was disconnected--------", socket.id);
-  
-      const findNewRoomConnect = newRoomConnect?.find((r) => r.roomMembers.includes(socket.id));
-      const findRoomeEnded = room_ended?.find((r) => r.roomId === findNewRoomConnect?.roomId);
-      const participantID = findNewRoomConnect?.roomMembers?.find((u) => u !== socket.id);
-  
-      userCount = userCount.filter((u) => u.socketID !== socket.id);
-  
-      const findUser = await OnlineUsers.findOne({ socketID: socket.id });
-      const findParticipant = await OnlineUsers.findOne({ socketID: participantID });
-  
-      if (findUser && findParticipant) {
-          findUser.status = "offline";
-          findParticipant.status = "offline";
-  
-          await findUser.save();
-          await findParticipant.save();
-      }
-  
-      console.log("sokcet-disconnect---", findRoomeEnded);
-  
-      if (findRoomeEnded) {
-          console.log("true----------", findRoomeEnded, findNewRoomConnect);
-  
-          room_ended = room_ended.map((room) => {
-              if (room.roomId === findNewRoomConnect.roomId) {
-                  room.endCount += 1;
-                  room.notSaveCount += 1;
-                  return room;
-              } else {
-                  return room;
-              }
-          });
-  
-          newRoomConnect = newRoomConnect.map((r) => {
-              if (r.roomId === findNewRoomConnect.roomId) {
-                  r.endCount += 1;
-                  return r;
-              } else {
-                  return r;
-              }
-          });
-  
-          if (findRoomeEnded.endCount === 2) {
-              console.log("endcount ===== 2--------------", findRoomeEnded);
-  
-              if (findRoomeEnded.notSaveCount === 2) {
-                  const directoryPath = `uploads/${findRoomeEnded.roomId}`;
-                  console.log(`Attempting to delete: ${directoryPath}`);
-  
-                  // Delete the directory
-                  fs.rm(directoryPath, { recursive: true, force: true }, (err) => {
-                      if (err) {
-                          console.error("Error deleting the directory:", err);
-                          return;
-                      }
-                      console.log(`Directory ${directoryPath} deleted successfully`);
-                  });
-              }
-  
-              room_ended = room_ended.filter((r) => r.roomId !== findNewRoomConnect.roomId);
-              newRoomConnect = newRoomConnect.filter((r) => r.roomId !== findNewRoomConnect.roomId);
-          }
-  
-          if (findRoomeEnded.endCount === 1) {
-              console.log("will--work--emit----=-----", findRoomeEnded);
-              socket.to(participantID).emit("end_chat", { message: "Zrucakicy lqec chaty" });
-          }
-      }
+let roomId 
 
-      socket.removeAllListeners();
-  });
-  
+let findChat 
+let findOnlineUser
+
+let intervalUsers = []
 
 
-  socket.on("join", async (payload) => {
-    roomId = getRandomRoomName();
+async function handleJoin(socket,payload) {
+     roomId = getRandomRoomName();
     console.log("user want to join", payload);
 
     userName_cookie = payload.socketID;
@@ -692,13 +616,55 @@ io.on("connection", (socket) => {
 
 
 
-
-  });
-
+}
 
 
 
-  socket.on("message", async (message) => {
+async function handleImageUpload(socket,data) {
+    const buffer = Buffer.from(data.image, "base64");
+    console.log("image----", data);
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, "0");
+    const minutes = now.getMinutes().toString().padStart(2, "0");
+    const seconds = now.getSeconds().toString().padStart(2, "0");
+    let messageTime = `${hours}:${minutes}:${seconds}`;
+
+    const imageSizeInBytes = Buffer.byteLength(buffer);
+
+
+const imageSizeInMB = (imageSizeInBytes / (1024 * 1024)).toFixed(2);
+
+console.log(`Image size: ${imageSizeInMB} MB`);
+console.log(`Image size: ${imageSizeInBytes} MB`);
+
+    let id = generateUniqueId();
+
+  const folderPath = path.join(__dirname, "uploads", roomId);
+    const fileName = `${Date.now()}.jpg`;
+    const filePath = path.join(folderPath, fileName);
+
+  if (!fs.existsSync(folderPath)) {
+  fs.mkdirSync(folderPath, { recursive: true });
+  }
+
+    fs.writeFile(filePath, buffer, (err) => {
+      if (err) {
+        console.error(err);
+      } else {
+      }
+    });
+    const imageUrl = `uploads/${roomId}/${fileName}`;
+
+    io.to(roomId).emit("receive_image", {
+      imageUrl,
+      userId: data.userId,
+      socketID: data.socketID,
+      messageTime,
+      messageID: id,
+    });
+}
+
+async function handleMessage(socket,message) {
     console.log("new-message----", message);
     const now = new Date();
     const hours = now.getHours().toString().padStart(2, "0");
@@ -742,127 +708,18 @@ io.on("connection", (socket) => {
 
     let id = generateUniqueId();
     console.log("gnacox message-----");
-    if(findUser && message.content){
-      sendMessageNotification(findUser,message.content)
-    }
+    // if(findUser && message.content){
+    //   sendMessageNotification(findUser,message.content)
+    // }
     io.to(message.roomId).emit("createMessage", {
       ...message,
       messageID: id,
       messageTime,
       updatedBonus: findUser.bonus
     });
-  });
+}
 
-  socket.on("image_upload", (data) => {
-    const buffer = Buffer.from(data.image, "base64");
-    console.log("image----", data);
-    const now = new Date();
-    const hours = now.getHours().toString().padStart(2, "0");
-    const minutes = now.getMinutes().toString().padStart(2, "0");
-    const seconds = now.getSeconds().toString().padStart(2, "0");
-    let messageTime = `${hours}:${minutes}:${seconds}`;
-
-    const imageSizeInBytes = Buffer.byteLength(buffer);
-
-
-const imageSizeInMB = (imageSizeInBytes / (1024 * 1024)).toFixed(2);
-
-console.log(`Image size: ${imageSizeInMB} MB`);
-console.log(`Image size: ${imageSizeInBytes} MB`);
-
-    let id = generateUniqueId();
-
-  const folderPath = path.join(__dirname, "uploads", roomId);
-    const fileName = `${Date.now()}.jpg`;
-    const filePath = path.join(folderPath, fileName);
-
-  if (!fs.existsSync(folderPath)) {
-  fs.mkdirSync(folderPath, { recursive: true });
-  }
-
-    fs.writeFile(filePath, buffer, (err) => {
-      if (err) {
-        console.error(err);
-      } else {
-      }
-    });
-    const imageUrl = `uploads/${roomId}/${fileName}`;
-
-    io.to(roomId).emit("receive_image", {
-      imageUrl,
-      userId: data.userId,
-      socketID: data.socketID,
-      messageTime,
-      messageID: id,
-    });
-  });
-
-  
-  socket.on("end_chat", async (info) => {
-    let findRoom = newRoomConnect?.find((r) => r.roomId === info.roomId);
-    let participantID = findRoom?.roomMembers?.find(
-      (u) => u !== info.socketID
-    );
-
-    console.log("end_chat--is worked--------",{roomId: info.roomId, user: info.socketID,findRoom,participantID});
-    
-    const findOnlineUser = await OnlineUsers.findOne({ user: info.userId });
-
-    if (findOnlineUser) {
-      findOnlineUser.status = "offline";
-      await findOnlineUser.save();
-    }
-
-    userCount = userCount.filter(
-      (u) => u.roomId !== info.roomId && u.socketID !== info.socketID
-    );
-    newRoomConnect.map((r)=>{
-      if(r.roomId === info.roomId){
-        r.endCount  = r.endCount + 1
-        return r
-      }else{
-        return r
-      }
-    })
-    if(findRoom && findRoom.endCount === 1){
-      
-      socket
-      .to(participantID)
-      .emit("end_chat", { message: "Zrucakicy lqec chaty" });
-      console.log("newRoomConnect---------changed--------",newRoomConnect);
-    }
-   
-    if(findRoom.endCount > 1){
-      newRoomConnect = newRoomConnect.filter((r) => r.roomId !== info.roomId);
-    }
-
-    
-
-
-    // socket.removeAllListeners("message");
-    // socket.removeAllListeners("image_upload");
-    // socket.removeAllListeners("sendVoiceMessage");
-    // socket.removeAllListeners("end_chat");
-
-    intervalUsers.push(
-      {
-        userId : info.userId, 
-        roomId: info.roomId, 
-        interval: setTimeout(() => {
-          console.log("will-work-timeout---------", info.socketID);
-          io.to(info.socketID).emit("closetime",{message:`Pahne Ekel ${info.socketID}-----${info.userId}`})
-          
-        }, 20000) 
-      }
-    )
-    
-
-
-    
-  });
-
-
-  socket.on("sendVoiceMessage", (data) => {
+async function handleSendVoiceMessage(socket,data) {
     const voiceBlob = Buffer.from(new Uint8Array(data.voiceBlob));
  
     const now = new Date();
@@ -913,9 +770,84 @@ console.log(`Image size: ${imageSizeInBytes} MB`);
  .save(convertedFilePath);
 
     });
- });
+}
 
-  socket.on("isSaved",async (info)=>{
+async function handleEndChat(socket,info) {
+    let findRoom = newRoomConnect?.find((r) => r.roomId === info.roomId);
+    let participantID = findRoom?.roomMembers?.find(
+      (u) => u !== info.socketID
+    );
+
+    console.log("end_chat--is worked--------",{roomId: info.roomId, user: info.socketID,findRoom,participantID});
+    
+    const findOnlineUser = await OnlineUsers.findOne({ user: info.userId });
+
+    if (findOnlineUser) {
+      findOnlineUser.status = "offline";
+      await findOnlineUser.save();
+    }
+
+    userCount = userCount.filter(
+      (u) => u.roomId !== info.roomId && u.socketID !== info.socketID
+    );
+    newRoomConnect.map((r)=>{
+      if(r.roomId === info.roomId){
+        r.endCount  = r.endCount + 1
+        return r
+      }else{
+        return r
+      }
+    })
+    if(findRoom && findRoom.endCount === 1){
+      
+      socket
+      .to(participantID)
+      .emit("end_chat", { message: "Zrucakicy lqec chaty" });
+      console.log("newRoomConnect---------changed--------",newRoomConnect);
+    }
+   
+    if(findRoom?.endCount && findRoom?.endCount > 1){
+      newRoomConnect = newRoomConnect.filter((r) => r.roomId !== info.roomId);
+    }
+
+    
+
+
+    // socket.removeAllListeners("message");
+    // socket.removeAllListeners("image_upload");
+    // socket.removeAllListeners("sendVoiceMessage");
+    // socket.removeAllListeners("end_chat");
+
+    intervalUsers.push(
+      {
+        userId : info.userId, 
+        roomId: info.roomId, 
+        interval: setTimeout(() => {
+          console.log("will-work-timeout---------", info.socketID);
+          io.to(info.socketID).emit("closetime",{message:`Pahne Ekel ${info.socketID}-----${info.userId}`})
+          
+        }, 20000) 
+      }
+    )
+}
+
+async function handleOnFocus(socket,data) {
+      const findRoom = newRoomConnect.find(r=> r.roomId === data.roomId)
+    const participant = findRoom?.roomMembers?.find(r=> r !== data.socketID)
+    console.log("onFocus----participant", participant);
+    console.log("onFocus----data.socketID", data.socketID);
+    socket.to(participant).emit("onTyping", { isTyping: true});
+}
+
+async function handleOnBlur(socket,data) {
+      const findRoom = newRoomConnect.find(r=> r.roomId === data.roomId)
+    const participant = findRoom?.roomMembers?.find(r=> r !== data.socketID)
+    console.log("onBlur----participant", participant);
+    console.log("onBlur----data.socketID", data.socketID);
+    socket.to(participant).emit("onTyping", { isTyping: false});
+}
+
+async function handleIsSaved(socket,info) {
     let findEnded = room_ended.find((r) => r.roomId === info.roomId);
     console.log("isSaved-------",info);
     intervalUsers.map((u)=>{
@@ -1012,59 +944,136 @@ console.log(`Image size: ${imageSizeInBytes} MB`);
 
      
     }
+}
+
+
+
+io.on("connection", (socket) => {
+  console.log("A user connected");
+    if (!users[socket.id]) {
+    users[socket.id] = socket.id;
+  }
+
+  socket.emit("me", socket.id);
+
+  socket.on("join", (payload) => handleJoin(socket,payload));
+  socket.on("image_upload", (data) => handleImageUpload(socket,data));
+  socket.on("message", (message) => handleMessage(socket,message));
+  socket.on("sendVoiceMessage", (data) => handleSendVoiceMessage(socket,data));
+  socket.on("end_chat", (info) => {
+    handleEndChat(socket,info)
+    socket.off("join", handleJoin);
+    socket.off("image_upload", handleImageUpload);
+    socket.off("message", handleMessage);
+    socket.off("sendVoiceMessage", handleSendVoiceMessage);
+    socket.off("end_chat", handleEndChat);
+    socket.off("onFocus", handleOnFocus);
+    socket.off("onBlur", handleOnBlur);
+  });
+  socket.on("onFocus", (data) => handleOnFocus(socket,data));
+  socket.on("onBlur", (data) => handleOnBlur(socket,data));
+  socket.on("isSaved", (info) => {
+    handleIsSaved(socket,info)
+    removeSocketListeners(socket)
+    socket.leave(info.roomId);
+  });
+
+  socket.on("disconnect", async() => {
+      console.log("socket was disconnected--------", socket.id);
   
-    socket.off("join")
-    socket.off("room_joined")
-    socket.off("room_created")
-    socket.off("me")
-    socket.off("image_upload")
-    socket.off("message")
-    socket.off("sendVoiceMessage")
-    socket.off("end_chat")
-    socket.off("onFocus")
-    socket.off("onBlur")
-    socket.off("isSaved")
-    socket.off("testt")
-    socket.off("participant")
-    socket.off("createMessage")
-    socket.off("receive_image")
-    socket.off("closetime")
-    socket.off("receiveVoiceMessage")
-    
-    // socket.removeAllListeners("message");
-    // socket.removeAllListeners("image_upload");
-    // socket.removeAllListeners("sendVoiceMessage");
-    // socket.removeAllListeners("end_chat");
-    // socket.removeAllListeners("join");
-    // socket.removeAllListeners("onFocus");
-    // socket.removeAllListeners("onBlur");
-    // socket.removeAllListeners("isSaved") 
-  })
-
-
-  socket.on("onFocus", (data) => {
-    const findRoom = newRoomConnect.find(r=> r.roomId === data.roomId)
-    const participant = findRoom?.roomMembers?.find(r=> r !== data.socketID)
-    console.log("onFocus----participant", participant);
-    console.log("onFocus----data.socketID", data.socketID);
-    socket.to(participant).emit("onTyping", { isTyping: true});
-
-  })
-
-  socket.on("onBlur", (data) => {
-    const findRoom = newRoomConnect.find(r=> r.roomId === data.roomId)
-    const participant = findRoom?.roomMembers?.find(r=> r !== data.socketID)
-    console.log("onBlur----participant", participant);
-    console.log("onBlur----data.socketID", data.socketID);
-    socket.to(participant).emit("onTyping", { isTyping: false});
-  })
-
-  socket.on("testt",(data)=>{
-    console.log("test socket is worked",socket.id);
-  })
+      const findNewRoomConnect = newRoomConnect?.find((r) => r.roomMembers.includes(socket.id));
+      const findRoomeEnded = room_ended?.find((r) => r.roomId === findNewRoomConnect?.roomId);
+      const participantID = findNewRoomConnect?.roomMembers?.find((u) => u !== socket.id);
   
+      userCount = userCount.filter((u) => u.socketID !== socket.id);
+  
+      const findUser = await OnlineUsers.findOne({ socketID: socket.id });
+      const findParticipant = await OnlineUsers.findOne({ socketID: participantID });
+  
+      if (findUser && findParticipant) {
+          findUser.status = "offline";
+          findParticipant.status = "offline";
+  
+          await findUser.save();
+          await findParticipant.save();
+      }
+  
+      console.log("sokcet-disconnect---", findRoomeEnded);
+  
+      if (findRoomeEnded) {
+          console.log("true----------", findRoomeEnded, findNewRoomConnect);
+  
+          room_ended = room_ended.map((room) => {
+              if (room.roomId === findNewRoomConnect.roomId) {
+                  room.endCount += 1;
+                  room.notSaveCount += 1;
+                  return room;
+              } else {
+                  return room;
+              }
+          });
+  
+          newRoomConnect = newRoomConnect.map((r) => {
+              if (r.roomId === findNewRoomConnect.roomId) {
+                  r.endCount += 1;
+                  return r;
+              } else {
+                  return r;
+              }
+          });
+  
+          if (findRoomeEnded.endCount === 2) {
+              console.log("endcount ===== 2--------------", findRoomeEnded);
+  
+              if (findRoomeEnded.notSaveCount === 2) {
+                  const directoryPath = `uploads/${findRoomeEnded.roomId}`;
+                  console.log(`Attempting to delete: ${directoryPath}`);
+  
+                  // Delete the directory
+                  fs.rm(directoryPath, { recursive: true, force: true }, (err) => {
+                      if (err) {
+                          console.error("Error deleting the directory:", err);
+                          return;
+                      }
+                      console.log(`Directory ${directoryPath} deleted successfully`);
+                  });
+              }
+  
+              room_ended = room_ended.filter((r) => r.roomId !== findNewRoomConnect.roomId);
+              newRoomConnect = newRoomConnect.filter((r) => r.roomId !== findNewRoomConnect.roomId);
+          }
+  
+          if (findRoomeEnded.endCount === 1) {
+              console.log("will--work--emit----=-----", findRoomeEnded);
+              socket.to(participantID).emit("end_chat", { message: "Zrucakicy lqec chaty" });
+          }
+      }
+
+      socket.removeAllListeners();
+    removeSocketListeners(socket);
+  });
 });
 
+function removeSocketListeners(socket) {
+  socket.off("join", handleJoin);
+  socket.off("image_upload", handleImageUpload);
+  socket.off("message", handleMessage);
+  socket.off("sendVoiceMessage", handleSendVoiceMessage);
+  socket.off("end_chat", handleEndChat);
+  socket.off("onFocus", handleOnFocus);
+  socket.off("onBlur", handleOnBlur);
+  socket.off("isSaved", handleIsSaved);
+}
+
+
+
+
+
+
+
+
+
+// ---------------------------------------------
 
 
 app.get("/api/uploads/:roomId/:image", (req, res) => {

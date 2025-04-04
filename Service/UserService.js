@@ -56,6 +56,7 @@ const UserService = {
      
              const  allUsers = await OnlineUsers.find({ user: { $ne: userId } }).populate(["user"])
      
+             console.log("socketID -search--", socketID);
              console.log("all Users -search--", allUsers);
              const user = await User.findById(userId)
              
