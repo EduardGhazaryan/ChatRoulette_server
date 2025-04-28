@@ -514,7 +514,7 @@ const io = require("socket.io")(server, {
   pingInterval: 25000, 
   pingTimeout: 60000,
   cors: {
-    origin: "http://localhost:3000",
+    origin: "http://192.168.122.255:8081",
     methods: ["GET", "POST","PUT","DELETE"],
   },
   maxHttpBufferSize: 1e7
@@ -534,7 +534,8 @@ async function handleJoin(socket,payload) {
     console.log("user want to join", payload);
 
     userName_cookie = payload.socketID;
-
+  console.log("newRoomConnect----", newRoomConnect);
+  
     findChat = newRoomConnect.find(
       (chat) =>
         chat.roomMembers.includes(payload.socketID) &&
@@ -544,6 +545,8 @@ async function handleJoin(socket,payload) {
    
 
     if (findChat) {
+      console.log("findChat----", findChat);
+
       roomId = findChat.roomId;
       socket.join(findChat.roomId);
 
@@ -949,7 +952,7 @@ async function handleIsSaved(socket,info) {
 
 
 io.on("connection", (socket) => {
-  console.log("A user connected");
+  console.log(`${socket.id} user connected`);
     if (!users[socket.id]) {
     users[socket.id] = socket.id;
   }
